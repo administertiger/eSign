@@ -35,8 +35,8 @@ function WorkFlowScreen({ navigation }) {
 
     //----------------------Render Items---------------------------
 
+    //Get current date.
     const [currentDate, setCurrentDate] = useState('')
-
     useEffect(() => {
         var date = new Date().getDate();
         var month = new Date().getMonth() + 1;
@@ -45,11 +45,11 @@ function WorkFlowScreen({ navigation }) {
         setCurrentDate(date + '-' + month + '-' + year); //format: dd-mm-yy
     }, [])
 
-    function Item({ fileName, fileSize, id }) {
+    function renderItem({ item }) {
         return (
             <View>
                 <View style={styles.listBox}>
-                    <Text style={styles.listText} numberOfLines={1}>{fileName}</Text>
+                    <Text style={styles.listText} numberOfLines={1}>{item.fileName}</Text>
 
                     <Menu>
                         <MenuTrigger style={{ width: 40 }} >
@@ -60,11 +60,11 @@ function WorkFlowScreen({ navigation }) {
                                 <MenuOption onSelect={() => alert(`Not called`)} disabled={true}  >
                                     <View style={styles.menuBox}>
                                         <Text>File Name : </Text>
-                                        <Text style={{ width: 110, color: '#919191' }}>{fileName}</Text>
+                                        <Text style={{ width: 110, color: '#919191' }}>{item.fileName}</Text>
                                     </View>
                                     <View style={styles.menuBox}>
                                         <Text>File Size : </Text>
-                                        <Text style={styles.details}>{fileSize}kb</Text>
+                                        <Text style={styles.details}>{item.fileSize}kb</Text>
                                     </View>
                                     <View style={styles.menuBox}>
                                         <Text>Date : </Text>
@@ -73,7 +73,7 @@ function WorkFlowScreen({ navigation }) {
                                 </MenuOption>
                             </View>
                             <MenuOption onSelect={() => alert(`Save`)} text='Save' />
-                            <MenuOption onSelect={() => { deleteItem(id) }} >
+                            <MenuOption onSelect={() => { deleteItem(item.id) }} >
                                 <Text style={{ color: 'red' }}>Delete</Text>
                             </MenuOption>
                         </MenuOptions>
@@ -84,13 +84,7 @@ function WorkFlowScreen({ navigation }) {
         )
     }
 
-    function renderItem({ item }) {
-        return (<Item fileName={item.fileName}
-            fileSize={item.fileSize}
-            id={item.id} />)
-    }
-
-    //-------------------------------------------------
+    //------------------------------------------------------
 
     return (
         <MenuProvider>

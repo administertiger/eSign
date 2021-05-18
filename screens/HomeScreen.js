@@ -11,16 +11,10 @@ function HomeScreen({ navigation }) {
     }, [])
 
     //----------------------User profile-------------------------
-    const [user, setUser] = useState({
-        country: '',
-        email: '',
-        firstName: '',
-        lastName: '',
-        name: ''
-    })
+    const [user, setUser] = useState({})
 
     function getUserProfile() {
-        axios.get(API_URL + '/accounts',
+        axios.get(API_URL + '/accounts',  //Account API
             {
                 headers: {
                     'Authorization': 'Bearer ' + global.token
