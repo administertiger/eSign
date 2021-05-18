@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, SafeAreaView, StyleSheet, FlatList, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList } from 'react-native';
 import axios from 'axios';
-import uuid from 'react-native-uuid';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
 
