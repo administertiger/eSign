@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Button } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
@@ -9,7 +9,7 @@ function DocumentsScreen({ navigation }) {
 
     useEffect(() => {
         getList();
-    });
+    }, []);
 
     const [doucuments, setDocuments] = useState([])
 
@@ -21,17 +21,24 @@ function DocumentsScreen({ navigation }) {
                 }
             })
             .then((response) => {
-                //console.log(response);
+                console.log(response);
                 if (response.data) {
-                    //console.log('Documents List: ', response.data);
+                    console.log('Documents List: ', response.data);
 
                     //To get file documents only.
                     const data = response.data;
-                    let getFile = data.map((data) => data.file);
-                    //console.log('File = ', getFile)
 
-                    setDocuments(getFile);
-                    //console.log('doc = ', doucuments)
+                    const getFile = data.map((data) => data.file);
+                    const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
+                    console.log('getFile =', getFile)
+                    console.log('getCer =', getCertificate)
+
+                    //Merge File docs array and Certification array togethor.
+                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i]))
+                    console.log('merge = ', merge)
+
+                    setDocuments(merge);
+
                 }
 
             }, (error) => {
@@ -53,23 +60,27 @@ function DocumentsScreen({ navigation }) {
                         </MenuTrigger>
                         <MenuOptions>
                             <View style={{ borderBottomWidth: 1 }} >
-                                <MenuOption onSelect={() => alert(`Not called`)} disabled={true}  >
+                                <MenuOption onSelect={() => alert(`Not called`)} disabled={true}>
                                     <View style={styles.menuBox}>
                                         <Text>File Name : </Text>
                                         <Text style={{ width: 110, color: '#919191' }}>{item.displayName}</Text>
                                     </View>
                                     <View style={styles.menuBox}>
                                         <Text>File Size : </Text>
-                                        <Text style={styles.details}>{item.size}kb</Text>
+                                        <Text style={styles.details}>{item.size} bytes</Text>
                                     </View>
                                     <View style={styles.menuBox}>
                                         <Text>Date : </Text>
                                         <Text style={styles.details}>{item.lastModified}</Text>
                                     </View>
+                                    <View style={styles.menuBox}>
+                                        <Text>Certificate by : </Text>
+                                        <Text style={styles.details}>{item.certificateName}</Text>
+                                    </View>
                                 </MenuOption>
                             </View>
                             <MenuOption onSelect={() => alert(`Save`)} text='Save' />
-                            <MenuOption onSelect={() => alert(`Save`)}>
+                            <MenuOption onSelect={() => alert(`Delete`)}>
                                 <Text style={{ color: 'red' }}>Delete</Text>
                             </MenuOption>
                         </MenuOptions>
@@ -84,8 +95,8 @@ function DocumentsScreen({ navigation }) {
         <MenuProvider>
             <View style={styles.box}>
                 <Text style={styles.header}>Your Documents</Text>
-
-
+                <Button title='refresh' onPress={getList} />
+                <Text />
                 <FlatList data={doucuments} renderItem={RenderItem} keyExtractor={(item => item.lastModified)} />
 
             </View>
@@ -114,6 +125,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingVertical: 15,
         fontSize: 25,
+        fontWeight: 'bold',
     },
     //--------------Menu--------------
 
@@ -123,6 +135,7 @@ const styles = StyleSheet.create({
     },
     details: {
         color: '#919191',
+
     }
 })
 

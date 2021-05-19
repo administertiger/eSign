@@ -3,27 +3,44 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native
 import { MenuProvider } from 'react-native-popup-menu';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
-import * as ImagePicker from "react-native-image-picker";
 import uuid from 'react-native-uuid';
+import DocumentPicker from 'react-native-document-picker';
 
 function WorkFlowScreen({ navigation }) {
 
     const [file, setFile] = useState([]) //File state
 
-    //To access image library.
-    function handleChooseFile() {
-        const option = {};
+    const handleChooseFile = async () => {
+        //Opening Document Picker for selection of one file
+        try {
+            const res = await DocumentPicker.pick({
+                type: [DocumentPicker.types.pdf],
+            });
+            //Printing the log realted to the file
+            console.log('RES = ', res)
+            console.log('res : ' + JSON.stringify(res));
+            console.log('URI : ' + res.uri);
+            console.log('Type : ' + res.type);
+            console.log('File Name : ' + res.name);
+            console.log('File Size : ' + res.size);
 
-        ImagePicker.launchImageLibrary(option, response => {
-            console.log('response', response);
-            //alert(response.fileSize);
-            if (response.uri) {
-                setFile(prevItems => {
-                    return [{ id: uuid.v4(), fileName: response.fileName, fileSize: response.fileSize }, ...prevItems]
-                })
+            //Setting the state to show single file attributes
+            setFile(prevItems => {
+                return [{ id: uuid.v4(), name: res.name, uri: res.uri, type: res.type, size: res.size }, ...prevItems];
+            });
+            console.log('Rest = ', file);
+        } catch (err) {
+            //Handling any exception (If any)
+            if (DocumentPicker.isCancel(err)) {
+                //If user canceled the document selection
+                alert('Canceled from single doc picker');
+            } else {
+                //For Unknown Error
+                alert('Unknown Error: ' + JSON.stringify(err));
+                throw err;
             }
-        })
-    }
+        }
+    };
 
     function deleteItem(id) {
         return (
@@ -49,7 +66,7 @@ function WorkFlowScreen({ navigation }) {
         return (
             <View>
                 <View style={styles.listBox}>
-                    <Text style={styles.listText} numberOfLines={1}>{item.fileName}</Text>
+                    <Text style={styles.listText} numberOfLines={1}>{item.name}</Text>
 
                     <Menu>
                         <MenuTrigger style={{ width: 40 }} >
@@ -60,11 +77,11 @@ function WorkFlowScreen({ navigation }) {
                                 <MenuOption onSelect={() => alert(`Not called`)} disabled={true}  >
                                     <View style={styles.menuBox}>
                                         <Text>File Name : </Text>
-                                        <Text style={{ width: 110, color: '#919191' }}>{item.fileName}</Text>
+                                        <Text style={{ width: 110, color: '#919191' }}>{item.name}</Text>
                                     </View>
                                     <View style={styles.menuBox}>
                                         <Text>File Size : </Text>
-                                        <Text style={styles.details}>{item.fileSize}kb</Text>
+                                        <Text style={styles.details}>{item.size} bytes</Text>
                                     </View>
                                     <View style={styles.menuBox}>
                                         <Text>Date : </Text>
@@ -91,7 +108,7 @@ function WorkFlowScreen({ navigation }) {
 
             <View style={styles.box}>
                 <TouchableOpacity style={styles.buttonDropFile}
-                    onPress={handleChooseFile}>
+                    onPress={() => handleChooseFile()}>
                     <Icon name='folder' />
                     <Text>
                         CHOOSE FILE

@@ -21,10 +21,10 @@ function HomeScreen({ navigation }) {
                 }
             })
             .then((response) => {
-                console.log(response);
+                //console.log(response);
                 if (response.data) {
                     //console.log(JSON.stringify(response.data));
-                    console.log('User profile: ', response.data.profiles);
+                    //console.log('User profile: ', response.data.profiles);
                     setUser(response.data.profiles)
                 }
 
