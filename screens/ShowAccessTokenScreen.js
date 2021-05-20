@@ -33,6 +33,8 @@ function ShowAccessTokenScreen() {
                     ...newAuthState
                 });
 
+                global.accessToken = newAuthState.accessToken;
+
                 console.log(newAuthState);
 
             } catch (error) {
@@ -55,6 +57,7 @@ function ShowAccessTokenScreen() {
                 refreshToken: newAuthState.refreshToken || current.refreshToken
             }));
 
+            global.accessToken = newAuthState.refreshToken;
             console.log(authState)
 
         } catch (error) {

@@ -21,7 +21,7 @@ function DocumentsScreen({ navigation }) {
                 }
             })
             .then((response) => {
-                console.log(response);
+                //console.log('response = ', response);
                 if (response.data) {
                     console.log('Documents List: ', response.data);
 
@@ -30,12 +30,12 @@ function DocumentsScreen({ navigation }) {
 
                     const getFile = data.map((data) => data.file);
                     const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
-                    console.log('getFile =', getFile)
-                    console.log('getCer =', getCertificate)
+                    //console.log('getFile =', getFile)
+                    //console.log('getCer =', getCertificate)
 
                     //Merge File docs array and Certification array togethor.
                     const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i]))
-                    console.log('merge = ', merge)
+                    //console.log('merge = ', merge)
 
                     setDocuments(merge);
 

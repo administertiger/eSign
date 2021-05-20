@@ -5,10 +5,14 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-m
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import uuid from 'react-native-uuid';
 import DocumentPicker from 'react-native-document-picker';
+import axios from 'axios';
 
 function WorkFlowScreen({ navigation }) {
+    const API_URL = 'https://ws.esigns.cloud';
 
+    //---------------------------------------------------------------
     const [file, setFile] = useState([]) //File state
+    const [file_, setFile_] = useState()
 
     const handleChooseFile = async () => {
         //Opening Document Picker for selection of one file
@@ -16,19 +20,14 @@ function WorkFlowScreen({ navigation }) {
             const res = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf],
             });
-            //Printing the log realted to the file
-            console.log('RES = ', res)
-            console.log('res : ' + JSON.stringify(res));
-            console.log('URI : ' + res.uri);
-            console.log('Type : ' + res.type);
-            console.log('File Name : ' + res.name);
-            console.log('File Size : ' + res.size);
 
             //Setting the state to show single file attributes
             setFile(prevItems => {
                 return [{ id: uuid.v4(), name: res.name, uri: res.uri, type: res.type, size: res.size }, ...prevItems];
             });
-            console.log('Rest = ', file);
+
+            setFile_(res)
+
         } catch (err) {
             //Handling any exception (If any)
             if (DocumentPicker.isCancel(err)) {
@@ -41,6 +40,35 @@ function WorkFlowScreen({ navigation }) {
             }
         }
     };
+
+    function handleUploadFile() {
+        console.log('file_ = ', file_);
+        console.log('file = ', file);
+
+        //----------------------handleUploadFile----------------------
+        let formData = new FormData();
+        formData.append('file', file_);
+
+        console.log('formdata =', formData)
+
+        axios({
+            method: 'post',
+            url: API_URL + '/documents/pdf/digitalsign',
+            data: formData._parts.length > 0 ? formData : null,
+            headers: {
+                'Authorization': 'Bearer ' + global.token,
+                "content-type": "multipart/form-data"
+            },
+        })
+            .then((response) => {
+                console.log('response = ', response);
+                //console.log('id =', response.data.id)
+                console.log('Done? = ', 'DONE!!')
+            }, (error) => {
+                console.log(error);
+            })
+    }
+    //--------------------delete item from state-------------------
 
     function deleteItem(id) {
         return (
@@ -127,7 +155,7 @@ function WorkFlowScreen({ navigation }) {
                 </View>
 
                 <View style={styles.boxSign} >
-                    <TouchableOpacity style={styles.buttonSign}>
+                    <TouchableOpacity style={styles.buttonSign} onPress={() => handleUploadFile()}>
                         <Text>Sign <Icon name='arrow-right' /></Text>
                     </TouchableOpacity>
                 </View>
