@@ -21,7 +21,7 @@ function HomeScreen({ navigation }) {
                 }
             })
             .then((response) => {
-                //console.log(response);
+                console.log(response);
                 if (response.data) {
                     //console.log(JSON.stringify(response.data));
                     //console.log('User profile: ', response.data.profiles);
@@ -40,7 +40,7 @@ function HomeScreen({ navigation }) {
 
             <View style={styles.box}>
                 <Text style={styles.text}>Welcome {user.firstName} {user.lastName}</Text>
-                <Text style={{ textAlign: 'center' }}>{user.email}</Text>
+                <Text style={{ textAlign: 'center', fontSize: 17 }}>{user.email}</Text>
                 <Text style={{ textAlign: 'center' }}>{user.country}</Text>
                 <View style={styles.workBox}>
                     <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkFlowScreen') }} >
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     text: {
         textAlign: 'center',
         paddingTop: 20,
-        fontSize: 20,
+        fontSize: 23,
         fontFamily: 'sans-serif-medium',
         fontWeight: 'bold',
 
