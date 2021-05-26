@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, FlatList, Button, ActivityIndicator } from 'rea
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
-import uuid from 'react-native-uuid';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+
+import RNFetchBlob from 'rn-fetch-blob'
 
 function DocumentsScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
@@ -30,19 +31,14 @@ function DocumentsScreen({ navigation }) {
                 if (response.data) {
                     //console.log('Documents List: ', response.data);
 
-                    //To get file documents only.
                     const data = response.data;
-
-                    const getFile = data.map((data) => data);
+                    const getFile = data.map((data) => data); //Get file data
                     const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
-                    //console.log('getFile =', getFile)
-                    //console.log('getCer =', getCertificate)
 
                     //Merge File docs array and Certification array togethor.
-                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i], { id: uuid.v4() }))
-                    console.log('merge = ', merge)
+                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
+                    console.log('documents = ', merge)
                     setDocuments(merge);
-                    //console.log('data = ', documents)
                 }
 
             }, (error) => {
@@ -58,9 +54,9 @@ function DocumentsScreen({ navigation }) {
             console.log('count = ', itemCount)
             console.log('isLoading = ', isLoading)
         } else if ((itemCount + addNumber) >= documents.length) {
-            console.log('END!!')
-            setIsLoading(!isLoading)
+            console.log("You've reached the end!!")
             console.log('isLoading = ', isLoading)
+            setIsLoading(!isLoading)
         }
     }
 
@@ -73,24 +69,27 @@ function DocumentsScreen({ navigation }) {
     }
 
     //-----------------------Handle download------------------------
-    function handleDownload(id) {
-        axios({
-            method: 'get',
-            url: API_URL + '/files/' + id,
-            responseType: 'blob',
-            headers: {
-                'Authorization': 'Bearer ' + global.token,
-                'Content-Type': 'application/pdf',
-                'Accept': 'application/pdf',
-            },
-        })
-            .then(response => {
-                console.log('res =', response)
+    function handleDownload(item) {
+        const { fs } = RNFetchBlob
+        let DownloadDir = fs.dirs.DownloadDir // this is the Downloads directory.
+        let options = {
+            fileCache: true,
+            addAndroidDownloads: {
+                useDownloadManager: true, //uses the device's native download manager.
+                notification: true,
+                title: item.file.displayName, // Title of download notification.
+                path: DownloadDir + '/esigns_' + "." + item.file.extension, // this is the path where your download file will be in
+                description: 'Downloading file.',
 
+            }
+        }
+        RNFetchBlob.config(options)
+            .fetch('GET', "https://ws.esigns.cloud/files/" + item.id, { 'Authorization': 'Bearer ' + global.token, })
+            .then((res) => {
+                console.log("Success = ", res);
             })
-            .catch(error => console.log(error));
+            .catch((err) => { console.log('error', err) }) // To execute when download cancelled and other errors
     }
-
     //----------------------Render Items---------------------------
 
     function RenderItem({ item }) {
@@ -100,7 +99,7 @@ function DocumentsScreen({ navigation }) {
                     <Text numberOfLines={1} style={styles.listText}>{item.file.displayName}</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
 
-                        <TouchableOpacity onPress={() => handleDownload('ea781ee9-6d56-45e2-9c97-4d73d36d927f')}>
+                        <TouchableOpacity onPress={() => handleDownload(item)}>
                             <Icon name='download' color='black' size={20} />
                         </TouchableOpacity>
                         <Text>   </Text>
@@ -117,7 +116,7 @@ function DocumentsScreen({ navigation }) {
                                         </View>
                                         <View style={styles.menuBox}>
                                             <Text>File Size : </Text>
-                                            <Text style={styles.details}>{item.file.size} bytes</Text>
+                                            <Text style={styles.details}>{Math.ceil(item.file.size / 1000)} kb</Text>
                                         </View>
                                         <View style={styles.menuBox}>
                                             <Text>Date : </Text>
@@ -129,10 +128,6 @@ function DocumentsScreen({ navigation }) {
                                         </View>
                                     </MenuOption>
                                 </View>
-                                <MenuOption onSelect={() => alert(`Save`)} text='Save' />
-                                <MenuOption onSelect={() => alert(`Delete`)}>
-                                    <Text style={{ color: 'red' }}>Delete</Text>
-                                </MenuOption>
                             </MenuOptions>
                         </Menu>
                     </View>
