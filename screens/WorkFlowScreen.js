@@ -23,6 +23,7 @@ function WorkFlowScreen({ navigation }) {
                 type: [DocumentPicker.types.pdf],
             });
 
+            console.log('res = ', res)
             //Setting the state to show single file attributes
             setFile(prevItems => {
                 return [{ id: uuid.v4(), name: res.name, uri: res.uri, type: res.type, size: res.size }, ...prevItems];
@@ -70,7 +71,6 @@ function WorkFlowScreen({ navigation }) {
                 .then((response) => {
                     console.log('response = ', response);
                     console.log('Done? = ', 'DONE!!');
-
 
                     //Get status of each file.
                     let myInterval = setInterval(() => {

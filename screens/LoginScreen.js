@@ -1,7 +1,8 @@
-import React, { useState, useCallback } from 'react';
-import { View, Button, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Button, StyleSheet, Text, Alert, ActivityIndicator } from 'react-native';
 import { authorize } from 'react-native-app-auth';
 import { Configs } from '../components/configs';
+import axios from 'axios';
 
 const initialState = {
     hasLoggedInOnce: false,
@@ -12,9 +13,39 @@ const initialState = {
 };
 
 function LoginScreen({ navigation }) {
+    const API_URL = 'https://ws.esigns.cloud';
 
     const [authState, setAuthState] = useState(initialState);
+    const [user, setUser] = useState({})
 
+    //----------------------User profile-------------------------
+    function getUserProfile(token) {
+        axios.get(API_URL + '/accounts',  //Account API
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then((response) => {
+                console.log(response);
+                if (response.data) {
+                    //Set Global profile
+                    global.country = response.data.profiles.country;
+                    global.email = response.data.profiles.email;
+                    global.firstName = response.data.profiles.firstName;
+                    global.lastName = response.data.profiles.lastName;
+                    global.name = response.data.profiles.name
+
+                    console.log('Profile set!!', global.name)
+                }
+
+            }, (error) => {
+                console.log(error);
+
+            })
+    }
+
+    //-------------------------Get login--------------------------
     const handleAuthorize = useCallback(
         async provider => {
             try {
@@ -28,6 +59,7 @@ function LoginScreen({ navigation }) {
                     ...newAuthState
                 });
 
+                getUserProfile(newAuthState.accessToken)
                 global.token = newAuthState.accessToken; //Get accessToken
                 console.log('User token: ', newAuthState);
 
@@ -37,20 +69,21 @@ function LoginScreen({ navigation }) {
         }
     );
 
-    function deleteToken() {
+    function timeoutNavigate() {
         setTimeout(() => {
-            console.log('This wii appear after 1 second!!')
             navigation.navigate('HomeScreen')
-        }, 500);
+        }, 4000)
     }
+
     //------------------------------------------------------
 
     return (
         <View style={{ flex: 1, justifyContent: 'center' }}>
             {!!authState.accessToken ? (
-                <TouchableOpacity onPress={() => navigation.navigate('HomeScreen')}>
-                    <Text style={styles.text}>WELCOME</Text>
-                </TouchableOpacity>
+                <View>
+                    <ActivityIndicator size='large' color='black' />
+                    <Text style={styles.text} onPress={timeoutNavigate()}>Bringing you to the homepage...</Text>
+                </View>
             ) : null}
             <View style={{ justifyContent: 'center' }}>
                 {!authState.accessToken ? (

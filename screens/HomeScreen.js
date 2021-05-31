@@ -1,49 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import axios from 'axios';
+import { authorize } from 'react-native-app-auth';
+import { Configs } from '../components/configs';
 
 function HomeScreen({ navigation }) {
-    const API_URL = 'https://ws.esigns.cloud';
-
     useEffect(() => {
-        getUserProfile();
+        //console.log('token =', global.token)
+        //console.log('name: ', global.name)
     }, [])
 
-    //----------------------User profile-------------------------
-    const [user, setUser] = useState({})
-
-    function getUserProfile() {
-        axios.get(API_URL + '/accounts',  //Account API
-            {
-                headers: {
-                    'Authorization': 'Bearer ' + global.token
-                }
-            })
-            .then((response) => {
-                console.log(response);
-                if (response.data) {
-                    //console.log(JSON.stringify(response.data));
-                    //console.log('User profile: ', response.data.profiles);
-                    setUser(response.data.profiles)
-                }
-
-            }, (error) => {
-                console.log(error);
-
-            })
-
+    function editProfile() {
+        axios
     }
-    //------------------------------------------------------
+
     return (
         <View style={{ flex: 1 }}>
 
             <View style={styles.box}>
-                <Text style={styles.text}>Welcome {user.firstName} {user.lastName}</Text>
-                <Text style={{ textAlign: 'center', fontSize: 17 }}>{user.email}</Text>
-                <Text style={{ textAlign: 'center' }}>{user.country}</Text>
+                <Text style={styles.text}>Welcome {global.firstName} {global.lastName}</Text>
+                <Text style={{ textAlign: 'center', fontSize: 17 }}>{global.email}</Text>
+                <Text style={{ textAlign: 'center' }}>{global.country}</Text>
+                <TouchableOpacity style={{ paddingVertical: 10, }} onPress={() => editProfile()}>
+                    <Text style={{ textAlign: 'center', color: 'blue' }}>edit profile</Text>
+                </TouchableOpacity>
                 <View style={styles.workBox}>
-                    <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkFlowScreen') }} >
+                    <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkScreen') }} >
                         <Text>
                             <Icon name='plus' /> NEW WORKFLOW
                             </Text>
@@ -52,6 +35,19 @@ function HomeScreen({ navigation }) {
             </View>
         </View>
     );
+}
+
+//Header---------
+export function HomeHeader({ navigation }) {
+    return (
+        <View style={styles.homeHeader}>
+            <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.openDrawer()} >
+                <Icon name='align-left' size={25} color='black' />
+            </TouchableOpacity>
+            <Text style={styles.homeHeaderText}>eSigns </Text>
+            <Icon size={25} name='address-card' color='black' />
+        </View >
+    )
 }
 
 const styles = StyleSheet.create({
@@ -83,7 +79,28 @@ const styles = StyleSheet.create({
         fontSize: 23,
         fontFamily: 'sans-serif-medium',
         fontWeight: 'bold',
-
+    },
+    //Header---------
+    homeHeader: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        //backgroundColor: '#2b44bd',
+        //width: 100,
+    },
+    headerLeft: {
+        position: 'absolute',
+        left: 5
+    },
+    headerRight: {
+        position: 'absolute',
+        right: 5,
+        //backgroundColor: 'black',
+        padding: 7,
+        //borderRadius: 10
+    },
+    homeHeaderText: {
+        fontSize: 23,
     }
 })
 

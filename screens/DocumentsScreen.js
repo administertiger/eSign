@@ -6,6 +6,7 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import RNFetchBlob from 'rn-fetch-blob'
+import { refresh } from 'react-native-app-auth';
 
 function DocumentsScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
@@ -56,7 +57,7 @@ function DocumentsScreen({ navigation }) {
         } else if ((itemCount + addNumber) >= documents.length) {
             console.log("You've reached the end!!")
             console.log('isLoading = ', isLoading)
-            setIsLoading(!isLoading)
+            setIsLoading(false);
         }
     }
 
@@ -70,6 +71,15 @@ function DocumentsScreen({ navigation }) {
 
     //-----------------------Handle download------------------------
     function handleDownload(item) {
+        let filename = ''
+        const name = item.file.displayName;
+        for (let i = 0; i < name.length - 4; i++) {
+            console.log('i = ', i)
+            console.log('letter = ', name[i])
+            filename += name[i];
+            console.log('filename =', filename)
+        }
+
         const { fs } = RNFetchBlob
         let DownloadDir = fs.dirs.DownloadDir // this is the Downloads directory.
         let options = {
@@ -78,7 +88,7 @@ function DocumentsScreen({ navigation }) {
                 useDownloadManager: true, //uses the device's native download manager.
                 notification: true,
                 title: item.file.displayName, // Title of download notification.
-                path: DownloadDir + '/esigns_' + "." + item.file.extension, // this is the path where your download file will be in
+                path: DownloadDir + '/' + filename + "." + item.file.extension, // this is the path where your download file will be in
                 description: 'Downloading file.',
 
             }
@@ -171,6 +181,7 @@ const styles = StyleSheet.create({
     listText: {
         width: 250,
         fontSize: 25,
+        fontFamily: 'Verdana'
     },
     header: {
         textAlign: 'center',
