@@ -20,6 +20,8 @@ target 'Example' do
 
   pod 'react-native-progress-view', :path => '../node_modules/@react-native-community/progress-view'
 
+  pod 'RNFS', :path => '../node_modules/react-native-fs'
+
   target 'ExampleTests' do
     inherit! :complete
     # Pods for testing

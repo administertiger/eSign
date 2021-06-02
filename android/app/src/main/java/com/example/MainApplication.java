@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
 import org.wonday.pdf.RCTPdfView;
 import com.reactnativecommunity.progressview.RNCProgressViewPackage;
 import com.reactnativecommunity.androidprogressbar.RNCProgressBarPackage;
@@ -41,7 +42,10 @@ public class MainApplication extends Application implements ReactApplication {
         protected String getJSMainModuleName() {
           return "index";
         }
+        
       };
+
+      
 
   @Override
   public ReactNativeHost getReactNativeHost() {

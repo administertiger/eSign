@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import HomeScreen from './screens/HomeScreen'
 import DocumentsScreen from './screens/DocumentsScreen'
@@ -25,17 +25,10 @@ const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 
 //----------Drawer----------
-function DrawerNavigator({ navigation }) {
+function DrawerNavigator() {
     return (
-        <Drawer.Navigator initialRouteName="Home" drawerType='slide' drawerContent={props => {
-            return (
-
-                <DrawerContentScrollView {...props}>
-                    <DrawerItemList {...props} />
-                </DrawerContentScrollView>
-            )
-        }}>
-            <Drawer.Screen name="Home" component={StackNavigator} options={{ title: 'Home', drawerIcon: () => <Icon name='home' size={25} onPress={navigation.navigate('HomeScreen')} /> }} />
+        <Drawer.Navigator initialRouteName="Home" drawerType='slide' >
+            <Drawer.Screen name="Home" component={StackNavigator} options={{ title: 'Home', drawerIcon: () => <Icon name='home' size={25} /> }} />
             <Drawer.Screen name="About" component={AboutStack} options={{ title: 'About', drawerIcon: () => <Icon name='info-circle' size={25} /> }} />
             <Drawer.Screen name='CertificateScreen' component={CertificateStack} options={{ unmountOnBlur: true, title: 'Certification', drawerIcon: () => <Icon name='address-card' size={25} /> }} />
         </Drawer.Navigator>

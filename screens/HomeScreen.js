@@ -11,10 +11,6 @@ function HomeScreen({ navigation }) {
         //console.log('name: ', global.name)
     }, [])
 
-    function editProfile() {
-        axios
-    }
-
     return (
         <View style={{ flex: 1 }}>
 

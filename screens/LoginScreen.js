@@ -16,7 +16,6 @@ function LoginScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
 
     const [authState, setAuthState] = useState(initialState);
-    const [user, setUser] = useState({})
 
     //----------------------User profile-------------------------
     function getUserProfile(token) {
@@ -72,7 +71,7 @@ function LoginScreen({ navigation }) {
     function timeoutNavigate() {
         setTimeout(() => {
             navigation.navigate('HomeScreen')
-        }, 4000)
+        }, 6000)
     }
 
     //------------------------------------------------------
