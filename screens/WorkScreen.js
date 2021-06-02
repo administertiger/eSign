@@ -27,7 +27,7 @@ function WorkScreen({ navigation }) {
             console.log('res = ', res)
             //Setting the state to show single file attributes
             setFile({ name: res.name, uri: res.uri, type: res.type, size: res.size });
-            global.fileName = res.name;
+
         } catch (err) {
             //Handling any exception (If any)
             if (DocumentPicker.isCancel(err)) {
@@ -88,7 +88,7 @@ function WorkScreen({ navigation }) {
                 console.log('response = ', response);
                 console.log('Done? = ', 'DONE!!');
 
-                //Get status of each file.
+                //Get status of the file.
                 let myInterval = setInterval(() => {
                     axios({
                         method: 'GET',

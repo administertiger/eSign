@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
 import * as RNFS from 'react-native-fs';
+import base64 from 'react-native-base64'
 
 const forge = require('node-forge');
 
@@ -81,41 +82,71 @@ function Certificate() {
     };
 
     //---------------------handleSubmit-------------------------
+    function uploadFile() {
+        //Encode base64            
+        const base64pwd = base64.encode(text);
+
+        let formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('password', base64pwd);
+
+        axios({
+            method: 'post',
+            url: API_URL + '/certificates',
+            data: formData._parts.length > 0 ? formData : null,
+            headers: {
+                'Authorization': 'Bearer ' + global.token,
+                "content-type": "multipart/form-data"
+            },
+        }).then((response) => {
+            console.log('response = ', response);
+            console.log('Upload Success!!');
+
+        }, (error) => {
+            console.log(error);
+            console.log('Upload Fail T_T')
+        })
+    }
+
     function handleSubmit() {
         console.log('test');
 
         RNFS.readFile(selectedFile.uri, 'ascii').then(res => {
-            console.log('File = ', res)
+            //console.log('File = ', res)
 
             try {
                 // get p12 as ASN.1 object
                 var p12Asn1 = forge.asn1.fromDer(res);
-
                 var p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, text);
 
                 // get bags by type
                 var certBags = p12.getBags({ bagType: forge.pki.oids.certBag });
                 var pkeyBags = p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag });
+
                 // fetching certBag
                 var certBag = certBags[forge.pki.oids.certBag][0];
+
                 // fetching keyBag
                 var keybag = pkeyBags[forge.pki.oids.pkcs8ShroudedKeyBag][0];
+
                 // generate pem from private key
                 //var privateKeyPem = forge.pki.privateKeyToPem(keybag.key);
+
                 // generate pem from cert
                 //var certificate = forge.pki.certificateToPem(certBag.cert);
 
                 if (certBag && keybag) {
                     console.log(certBag.cert);
                     console.log('Success then upload file!');
+                    //console.log('certificate = ', certificate);
                     //setStatus('Check password PASS then upload file...');
-                    //uploadFile();
+                    uploadFile();
                 }
 
             } catch (error) {
 
                 console.log(error);
-                console.log('Fail!');
+                console.log('Fail!555');
                 //setStatus('Fail!');
 
             };

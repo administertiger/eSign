@@ -6,7 +6,6 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import RNFetchBlob from 'rn-fetch-blob'
-import { refresh } from 'react-native-app-auth';
 
 function DocumentsScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
@@ -71,13 +70,15 @@ function DocumentsScreen({ navigation }) {
 
     //-----------------------Handle download------------------------
     function handleDownload(item) {
+
+        //Get file name without extension (.pdf)
         let filename = ''
         const name = item.file.displayName;
         for (let i = 0; i < name.length - 4; i++) {
-            console.log('i = ', i)
-            console.log('letter = ', name[i])
+            //console.log('i = ', i)
+            //console.log('letter = ', name[i])
             filename += name[i];
-            console.log('filename =', filename)
+            //console.log('filename =', filename)
         }
 
         const { fs } = RNFetchBlob
@@ -96,7 +97,7 @@ function DocumentsScreen({ navigation }) {
         RNFetchBlob.config(options)
             .fetch('GET', "https://ws.esigns.cloud/files/" + item.id, { 'Authorization': 'Bearer ' + global.token, })
             .then((res) => {
-                console.log("Success = ", res);
+                //console.log("Success = ", res);
             })
             .catch((err) => { console.log('error', err) }) // To execute when download cancelled and other errors
     }
