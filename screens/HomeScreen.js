@@ -6,10 +6,6 @@ import { authorize } from 'react-native-app-auth';
 import { Configs } from '../components/configs';
 
 function HomeScreen({ navigation }) {
-    useEffect(() => {
-        //console.log('token =', global.token)
-        //console.log('name: ', global.name)
-    }, [])
 
     return (
         <View style={{ flex: 1 }}>
@@ -18,7 +14,7 @@ function HomeScreen({ navigation }) {
                 <Text style={styles.text}>Welcome {global.firstName} {global.lastName}</Text>
                 <Text style={{ textAlign: 'center', fontSize: 17 }}>{global.email}</Text>
                 <Text style={{ textAlign: 'center' }}>{global.country}</Text>
-                <TouchableOpacity style={{ paddingVertical: 10, }} onPress={() => editProfile()}>
+                <TouchableOpacity style={{ paddingVertical: 10, }}>
                     <Text style={{ textAlign: 'center', color: 'blue' }}>edit profile</Text>
                 </TouchableOpacity>
                 <View style={styles.workBox}>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
@@ -14,8 +14,11 @@ function Certificate() {
     const [certificate, setCertificate] = useState({});
     const [isLoading, setIsLoading] = useState(true)
     const [text, onChangeText] = useState('');
-    const [modalState, setModalState] = useState(false)
     const [selectedFile, setSelectedFile] = useState({})
+
+    //Modal
+    const [uploadModalLoading, setUploadModalLoading] = useState(false)
+    const [passwordModalState, setPasswordModalState] = useState(false)
 
     useState(() => {
         getUserProfile();
@@ -35,13 +38,13 @@ function Certificate() {
                 }
             })
             .then((response) => {
-                console.log(response);
+                //console.log(response);
                 if (response.data) {
                     console.log('certificate = ', response.data.certificates)
                     setCertificate(response.data.certificates)
                     setIsLoading(false)
                 }
-                console.log(certificate);
+                //console.log(certificate);
 
             }, (error) => {
                 console.log(error);
@@ -52,7 +55,6 @@ function Certificate() {
     //-------------------handleChoosefile---------------------
     useEffect(() => {
         console.log('selectedFile = ', selectedFile);
-
     }, [selectedFile])
 
     const handleChooseFile = async () => {
@@ -62,12 +64,17 @@ function Certificate() {
                 type: [DocumentPicker.types.allFiles],
             });
 
-            console.log('res = ', res)
-            //Setting the state to show single file attributes
-            setSelectedFile(res)
+            if (res.type === 'application/x-pkcs12') {
+                console.log('res = ', res)
+                //Setting the state to show single file attributes
+                setSelectedFile(res)
+                setPasswordModalState(true)
+            } else {
+                console.log('Wrong file type');
+                Alert.alert('Please choose only p12 file')
+                setSelectedFile({})
 
-            console.log('HI!')
-
+            }
         } catch (err) {
             //Handling any exception (If any)
             if (DocumentPicker.isCancel(err)) {
@@ -82,6 +89,8 @@ function Certificate() {
     };
 
     //---------------------handleSubmit-------------------------
+
+    //--------Upload----------
     function uploadFile() {
         //Encode base64            
         const base64pwd = base64.encode(text);
@@ -101,59 +110,71 @@ function Certificate() {
         }).then((response) => {
             console.log('response = ', response);
             console.log('Upload Success!!');
-
+            getUserProfile();
+            setSelectedFile({});
+            setUploadModalLoading(false);
+            Alert.alert('Upload success!')
         }, (error) => {
             console.log(error);
             console.log('Upload Fail T_T')
         })
     }
 
+    //----------Submit-----------
     function handleSubmit() {
-        console.log('test');
 
-        RNFS.readFile(selectedFile.uri, 'ascii').then(res => {
-            //console.log('File = ', res)
+        if (text) {
+            //console.log('test');
 
-            try {
-                // get p12 as ASN.1 object
-                var p12Asn1 = forge.asn1.fromDer(res);
-                var p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, text);
+            RNFS.readFile(selectedFile.uri, 'ascii').then(res => {
+                //console.log('File = ', res)
 
-                // get bags by type
-                var certBags = p12.getBags({ bagType: forge.pki.oids.certBag });
-                var pkeyBags = p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag });
+                try {
+                    // get p12 as ASN.1 object
+                    var p12Asn1 = forge.asn1.fromDer(res);
+                    var p12 = forge.pkcs12.pkcs12FromAsn1(p12Asn1, text);
 
-                // fetching certBag
-                var certBag = certBags[forge.pki.oids.certBag][0];
+                    // get bags by type
+                    var certBags = p12.getBags({ bagType: forge.pki.oids.certBag });
+                    var pkeyBags = p12.getBags({ bagType: forge.pki.oids.pkcs8ShroudedKeyBag });
 
-                // fetching keyBag
-                var keybag = pkeyBags[forge.pki.oids.pkcs8ShroudedKeyBag][0];
+                    // fetching certBag
+                    var certBag = certBags[forge.pki.oids.certBag][0];
 
-                // generate pem from private key
-                //var privateKeyPem = forge.pki.privateKeyToPem(keybag.key);
+                    // fetching keyBag
+                    var keybag = pkeyBags[forge.pki.oids.pkcs8ShroudedKeyBag][0];
 
-                // generate pem from cert
-                //var certificate = forge.pki.certificateToPem(certBag.cert);
+                    // generate pem from private key
+                    //var privateKeyPem = forge.pki.privateKeyToPem(keybag.key);
 
-                if (certBag && keybag) {
-                    console.log(certBag.cert);
-                    console.log('Success then upload file!');
-                    //console.log('certificate = ', certificate);
-                    //setStatus('Check password PASS then upload file...');
-                    uploadFile();
-                }
+                    // generate pem from cert
+                    //var certificate = forge.pki.certificateToPem(certBag.cert);
 
-            } catch (error) {
+                    if (certBag && keybag) {
+                        //console.log(certBag.cert);
+                        console.log('Success then upload file!');
+                        setPasswordModalState(false);
+                        uploadFile();
+                        setUploadModalLoading(true);
+                    }
 
-                console.log(error);
-                console.log('Fail!555');
-                //setStatus('Fail!');
+                } catch (error) {
 
-            };
-        })
-            .catch(err => {
-                console.log(err.message, err.code);
-            });
+                    console.log(error);
+                    console.log('Fail!555');
+                    setPasswordModalState(false);
+                    Alert.alert('Invalid password')
+                    setSelectedFile({})
+
+                };
+            })
+                .catch(err => {
+                    console.log(err.message, err.code);
+                });
+        } else {
+            console.log('Type the password')
+            Alert.alert('Type the password')
+        }
     }
 
     //----------------Render flatlist------------------
@@ -169,20 +190,32 @@ function Certificate() {
     function CancleModal() {
         return (
             onChangeText(''),
-            setModalState(false)
+            setPasswordModalState(false),
+            setSelectedFile({}),
+            Alert.alert('Cancel!')
         )
     }
 
     return (
         <View style={{ flex: 1 }}>
             <Modal
+                nimationType="fade"
+                transparent={true}
+                visible={uploadModalLoading}>
+                <View style={{ justifyContent: 'center', flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
+                    <View>
+                        <ActivityIndicator size='large' color='white' animating={true} />
+                    </View>
+                </View>
+            </Modal>
+            <Modal
                 animationType="fade"
                 transparent={true}
-                visible={modalState}
+                visible={passwordModalState}
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalBox}>
-                        <Text>Test Modal</Text>
+                        <Text>Password</Text>
                         <TextInput
                             style={styles.input}
                             onChangeText={onChangeText}
@@ -190,7 +223,8 @@ function Certificate() {
                         />
                         <View style={{ flexDirection: 'row', paddingTop: 5 }}>
                             <Button title='cancel' onPress={() => CancleModal()} />
-                            <Button title='ok' onPress={() => setModalState(false)} />
+                            <Text>  </Text>
+                            <Button title='submit' onPress={() => handleSubmit()} />
                         </View>
                     </View>
                 </View>
@@ -207,13 +241,6 @@ function Certificate() {
                     <Text><Icon name='folder' /> Choose File</Text>
                 </TouchableOpacity>
                 <Text />
-                <TouchableOpacity style={styles.buttonAdd} onPress={() => setModalState(true)}>
-                    <Text><Icon name='plus' /> Add Certificate</Text>
-                </TouchableOpacity>
-                <Text />
-                <TouchableOpacity style={styles.buttonAdd} onPress={handleSubmit}>
-                    <Text>Submit</Text>
-                </TouchableOpacity>
             </View>
         </View >
     )
@@ -242,7 +269,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'flex-end',
         alignItems: 'center',
-        paddingBottom: 50,
+        paddingBottom: 30,
     },
     buttonAdd: {
         borderWidth: 2,
@@ -259,6 +286,7 @@ const styles = StyleSheet.create({
         height: 50,
         width: 150,
         borderWidth: 2,
+        marginVertical: 10,
     },
     modalContainer: {
         flex: 1,
