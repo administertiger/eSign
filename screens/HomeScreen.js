@@ -18,7 +18,7 @@ function HomeScreen({ navigation }) {
                     <Text style={{ textAlign: 'center', color: 'blue' }}>edit profile</Text>
                 </TouchableOpacity>
                 <View style={styles.workBox}>
-                    <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkScreen') }} >
+                    <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkDrawer') }} >
                         <Text>
                             <Icon name='plus' /> NEW WORKFLOW
                             </Text>
@@ -34,10 +34,10 @@ export function HomeHeader({ navigation }) {
     return (
         <View style={styles.homeHeader}>
             <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.openDrawer()} >
-                <Icon name='align-left' size={25} color='black' />
+                <Icon name='align-left' size={25} color='white' />
             </TouchableOpacity>
             <Text style={styles.homeHeaderText}>eSigns </Text>
-            <Icon size={25} name='address-card' color='black' />
+            <Icon size={25} name='address-card' color='white' />
         </View >
     )
 }
@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 4,
         borderStyle: 'dashed',
+        backgroundColor: 'rgba(117, 124, 136, 0.2)'
     },
     workBox: {
         //borderWidth: 1,
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         //backgroundColor: '#2b44bd',
-        //width: 100,
+
     },
     headerLeft: {
         position: 'absolute',
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
     },
     homeHeaderText: {
         fontSize: 23,
+        color: 'white'
     }
 })
 

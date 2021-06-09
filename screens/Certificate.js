@@ -11,10 +11,10 @@ const forge = require('node-forge');
 function Certificate() {
     const API_URL = 'https://ws.esigns.cloud';
 
-    const [certificate, setCertificate] = useState({});
-    const [isLoading, setIsLoading] = useState(true)
+    const [certificate, setCertificate] = useState([]);
     const [text, onChangeText] = useState('');
-    const [selectedFile, setSelectedFile] = useState({})
+    const [selectedFile, setSelectedFile] = useState({});
+    const [currentCertificate, setCerrentCertificate] = useState({})
 
     //Modal
     const [uploadModalLoading, setUploadModalLoading] = useState(false)
@@ -31,6 +31,8 @@ function Certificate() {
 
     //--------------------Get current certification.------------------
     function getUserProfile() {
+
+
         axios.get(API_URL + '/accounts',  //Account API
             {
                 headers: {
@@ -38,11 +40,19 @@ function Certificate() {
                 }
             })
             .then((response) => {
-                //console.log(response);
+                console.log(response);
                 if (response.data) {
                     console.log('certificate = ', response.data.certificates)
                     setCertificate(response.data.certificates)
-                    setIsLoading(false)
+                    setUploadModalLoading(false);
+
+                    const testCer = response.data.certificates
+                    const obj = testCer.find(item => item.id === response.data.settings.defaultCertificateId)
+                    console.log('obj = ', obj)
+                    console.log('Current certificate = ', obj.certificateName)
+                    setCerrentCertificate(obj);
+
+
                 }
                 //console.log(certificate);
 
@@ -114,6 +124,7 @@ function Certificate() {
             setSelectedFile({});
             setUploadModalLoading(false);
             Alert.alert('Upload success!')
+
         }, (error) => {
             console.log(error);
             console.log('Upload Fail T_T')
@@ -177,11 +188,69 @@ function Certificate() {
         }
     }
 
+    //---------------------------Delete certificate---------------------------
+    function DeleteCertificate(id) {
+
+        setUploadModalLoading(true);
+        axios({
+            method: 'DELETE',
+            url: API_URL + '/accounts/certificates/' + id,
+            headers: {
+                'Authorization': 'Bearer ' + global.token,
+            }
+        }).then((response) => {
+            console.log('delete = ', response)
+            getUserProfile();
+            Alert.alert('Delete!')
+
+        }, (error) => {
+            console.log(error);
+            console.log('Upload Fail T_T')
+        })
+    }
+
+    //------------------------------Change Certification--------------------------
+    function changeCertification(id) {
+        setUploadModalLoading(true);
+
+        axios({
+            method: 'PATCH',
+            url: API_URL + '/accounts',
+            headers: {
+                'Authorization': 'Bearer ' + global.token,
+                "content-type": "application/json",
+            },
+            data: {
+                "replace": "/settings/defaultCertificateId",
+                "value": id
+            }
+        }).then((response) => {
+            console.log('response = ', response)
+            getUserProfile();
+            //Alert.alert('Success!')
+        }, (error) => {
+            console.log(error)
+        })
+    }
+
     //----------------Render flatlist------------------
     function renderItem({ item }) {
+        if (item.id === currentCertificate.id) {
+            return <View />
+        }
+
         return (
-            <View>
-                <Text> {'=> '} {item.certificateName}</Text>
+            <View style={styles.renderBox}>
+                <Text numberOfLines={1} style={{ width: 230, fontSize: 17, fontWeight: 'bold' }} >{item.certificateName}</Text>
+                <View style={{ flexDirection: 'row' }}>
+                    <TouchableOpacity onPress={() => changeCertification(item.id)} >
+                        <Icon name='check-circle' size={40} />
+                    </TouchableOpacity>
+                    <Text>  </Text>
+                    <TouchableOpacity onPress={() => DeleteCertificate(item.id)} >
+                        <Icon name='times-circle' size={40} />
+                    </TouchableOpacity>
+                </View>
             </View>
         )
     }
@@ -191,15 +260,29 @@ function Certificate() {
         return (
             onChangeText(''),
             setPasswordModalState(false),
-            setSelectedFile({}),
-            Alert.alert('Cancel!')
+            setSelectedFile({})
+            //Alert.alert('Cancel!')
         )
+    }
+    //--------------Footer---------------
+    const [footerLoading, setFooterLoading] = useState(true)
+
+    function renderFooter() {
+        return (
+            <View style={styles.loader}>
+                <ActivityIndicator size='large' color='black' animating={footerLoading} />
+            </View>
+        )
+    }
+
+    function handleLoadMore() {
+        setFooterLoading(false);
     }
 
     return (
         <View style={{ flex: 1 }}>
             <Modal
-                nimationType="fade"
+                animationType="fade"
                 transparent={true}
                 visible={uploadModalLoading}>
                 <View style={{ justifyContent: 'center', flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
@@ -222,18 +305,25 @@ function Certificate() {
                             value={text}
                         />
                         <View style={{ flexDirection: 'row', paddingTop: 5 }}>
-                            <Button title='cancel' onPress={() => CancleModal()} />
-                            <Text>  </Text>
                             <Button title='submit' onPress={() => handleSubmit()} />
+                            <Text>  </Text>
+                            <Button title='cancel' onPress={() => CancleModal()} />
                         </View>
                     </View>
                 </View>
             </Modal>
+            <View style={{ paddingVertical: 10 }}>
+                <Text style={styles.headerText}>Your Current Certificate</Text>
+                <View style={{ borderTopWidth: 1, borderBottomWidth: 1, marginHorizontal: 15, paddingVertical: 10, marginTop: 10, }}>
+                    <Text style={styles.headerText}>{currentCertificate.certificateName}</Text>
+                </View>
+            </View>
             <View style={styles.showCertificate}>
-                <Text style={styles.headerText}>Your certificate</Text>
-                <Text />
-                <FlatList data={certificate} renderItem={renderItem} />
-                <ActivityIndicator size='large' color='black' animating={isLoading} />
+                <FlatList data={certificate}
+                    renderItem={renderItem}
+                    ListFooterComponent={renderFooter}
+                    onEndReached={handleLoadMore}
+                    onEndReachedThreshold={0} />
             </View>
             <View style={styles.buttonBox}>
                 <Text>{selectedFile.name}</Text>
@@ -260,25 +350,37 @@ export function CertificateHeader({ navigation }) {
 
 const styles = StyleSheet.create({
     showCertificate: {
-        alignItems: 'center',
+        //alignItems: 'center',
         //borderWidth: 1,
-        paddingTop: 20,
+        //paddingTop: 10,
+        paddingHorizontal: 20,
+        flex: 1,
+        marginBottom: 90,
     },
     buttonBox: {
         //borderWidth: 1,
-        flex: 1,
-        justifyContent: 'flex-end',
+        //flex: 1,
+        //justifyContent: 'flex-end',
         alignItems: 'center',
-        paddingBottom: 30,
+        //paddingBottom: 30,
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
     },
     buttonAdd: {
         borderWidth: 2,
         padding: 10,
         paddingHorizontal: 50,
+        height: 60,
+        justifyContent: 'center',
     },
     headerText: {
-        fontSize: 25,
+        fontSize: 20,
         fontWeight: 'bold',
+        //paddingVertical: 20,
+        //paddingLeft: 20,
+        textAlign: 'center'
     },
 
     //Modal---------
@@ -326,6 +428,18 @@ const styles = StyleSheet.create({
     },
     homeHeaderText: {
         fontSize: 23,
+    },
+    //Render items-------
+    renderBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderWidth: 1,
+        borderRadius: 10,
+        marginBottom: 10,
+        padding: 10,
+        height: 80,
+        paddingHorizontal: 15,
     }
 })
 

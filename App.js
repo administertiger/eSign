@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, Button } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -7,17 +7,21 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
+//Screens
 import HomeScreen from './screens/HomeScreen'
 import DocumentsScreen from './screens/DocumentsScreen'
 import AboutScreen from './screens/AboutScreen'
 import LoginScreen from './screens/LoginScreen'
 import WorkScreen from './screens/WorkScreen'
 import Certificate from './screens/Certificate'
+import GoToWork from './screens/DummyPage'
 
 import { HomeHeader } from './screens/HomeScreen'
 import { AboutHeader } from './screens/AboutScreen'
 import { CertificateHeader } from './screens/Certificate'
 import { WorkHeader } from './screens/WorkScreen'
+
+import SideBar from './components/CustomDrawer'
 
 //------------------------Navigation-----------------------
 const Stack = createStackNavigator();
@@ -27,10 +31,13 @@ const Drawer = createDrawerNavigator();
 //----------Drawer----------
 function DrawerNavigator() {
     return (
-        <Drawer.Navigator initialRouteName="Home" drawerType='slide' >
-            <Drawer.Screen name="Home" component={StackNavigator} options={{ title: 'Home', drawerIcon: () => <Icon name='home' size={25} /> }} />
-            <Drawer.Screen name="About" component={AboutStack} options={{ title: 'About', drawerIcon: () => <Icon name='info-circle' size={25} /> }} />
-            <Drawer.Screen name='CertificateScreen' component={CertificateStack} options={{ unmountOnBlur: true, title: 'Certification', drawerIcon: () => <Icon name='address-card' size={25} /> }} />
+        <Drawer.Navigator initialRouteName='HomeDrawer' drawerType='slide' drawerContent={props => <SideBar {...props} />} >
+            <Drawer.Screen name="HomeDrawer" component={HomeStack} />
+            <Drawer.Screen name="AboutDrawer" component={AboutStack} />
+            <Drawer.Screen name='CertificateDrawer' component={CertificateStack} />
+            <Drawer.Screen name='GotoWorkDrawer' component={GoToWork} options={{ unmountOnBlur: true }} />
+            <Drawer.Screen name='WorkDrawer' component={WorkStack} options={{ unmountOnBlur: true, swipeEnabled: false }} />
+
         </Drawer.Navigator>
     )
 }
@@ -46,7 +53,7 @@ function TabNavigator() {
             },
 
         }}>
-            <Tab.Screen name='HomeScreen' component={HomeScreen}
+            <Tab.Screen name='HomeTab' component={HomeScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: 'center', }}>
@@ -55,7 +62,7 @@ function TabNavigator() {
                         </View>
                     ),
                 }} />
-            <Tab.Screen name='DocumentsScreen' component={DocumentsScreen}
+            <Tab.Screen name='DocumentsTab' component={DocumentsScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: 'center' }}>
@@ -70,17 +77,19 @@ function TabNavigator() {
 }
 
 //----------Stacks----------
-function StackNavigator({ navigation }) {
+function HomeStack({ navigation }) {
     return (
-
         <Stack.Navigator >
-            <Stack.Screen name='HomeScreen' component={TabNavigator}
+            <Stack.Screen name='HomeStack' component={TabNavigator}
                 options={
                     {
                         headerTitle: () => <HomeHeader navigation={navigation} />,
                         headerLeft: null,
+                        headerStyle: {
+                            backgroundColor: '#3944BC'
+                        }
+
                     }} />
-            <Stack.Screen name='ShowAccessTokenScreen' component={DrawerNavigator} />
         </Stack.Navigator>
 
     )
@@ -89,7 +98,7 @@ function StackNavigator({ navigation }) {
 function AboutStack({ navigation }) {
     return (
         <Stack.Navigator>
-            <Stack.Screen name='AboutScreen' component={AboutScreen}
+            <Stack.Screen name='AboutStack' component={AboutScreen}
                 options={
                     {
                         headerTitle: () => <AboutHeader navigation={navigation} />,
@@ -101,12 +110,30 @@ function AboutStack({ navigation }) {
 function CertificateStack({ navigation }) {
     return (
         <Stack.Navigator>
-            <Stack.Screen name='CertificateScreen' component={Certificate}
+            <Stack.Screen name='CertificateStack' component={Certificate}
                 options={
                     {
                         headerTitle: () => <CertificateHeader navigation={navigation} />,
-                        headerLeft: null
+                        headerLeft: null,
                     }} />
+        </Stack.Navigator>
+    )
+}
+function WorkStack({ navigation }) {
+    return (
+        <Stack.Navigator>
+            <Stack.Screen
+                name={'WorkStack'}
+                component={WorkScreen}
+                options={
+                    {
+                        headerTitle: () => <WorkHeader navigation={navigation} />,
+                        headerLeft: null,
+                        headerStyle: {
+                            backgroundColor: '#3944BC'
+                        },
+                    }}
+            />
         </Stack.Navigator>
     )
 }
@@ -122,6 +149,7 @@ const App = () => {
                         {
                             headerShown: false,
                         }} />
+
                 <Stack.Screen
                     name='HomeScreen'
                     component={DrawerNavigator}
@@ -132,15 +160,7 @@ const App = () => {
                     }
                 />
 
-                <Stack.Screen
-                    name={'WorkScreen'}
-                    component={WorkScreen}
-                    options={
-                        {
-                            headerTitle: () => <WorkHeader />,
-                            //headerLeft: null,
-                        }}
-                />
+
             </Stack.Navigator>
         </NavigationContainer>
     )

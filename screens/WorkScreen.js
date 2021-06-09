@@ -33,7 +33,7 @@ function WorkScreen({ navigation }) {
             if (DocumentPicker.isCancel(err)) {
                 //If user canceled the document selection
                 alert('Canceled from single doc picker');
-                navigation.navigate('HomeScreen')
+                navigation.navigate('HomeStack')
             } else {
                 //For Unknown Error
                 alert('Unknown Error: ' + JSON.stringify(err));
@@ -100,7 +100,7 @@ function WorkScreen({ navigation }) {
                             clearInterval(myInterval);
                             console.log('Complete!')
                             Alert.alert('complete')
-                            navigation.navigate('DocumentsScreen')
+                            navigation.navigate('DocumentsTab')
                         } else if (response.data.status === 'fail') {
                             clearInterval(myInterval);
                             console.log('Fail T_T')
@@ -121,12 +121,6 @@ function WorkScreen({ navigation }) {
             {file.uri ? (
                 <View >
                     <ShowPdf />
-                    <View style={{ position: 'absolute', top: 20, left: 0, right: 0, alignItems: 'center' }}>
-                        <TouchableOpacity style={styles.addFileButton} onPress={() => handleChooseFile()}>
-                            <Text style={styles.signText}>New File </Text>
-                            <Icon name='folder-open' size={18} />
-                        </TouchableOpacity>
-                    </View>
                     <View style={styles.singButtonBox} >
                         <TouchableOpacity style={styles.singButton} onPress={() => handleUploadFile()}>
                             <Text style={styles.signText}>Sign </Text>
@@ -140,10 +134,16 @@ function WorkScreen({ navigation }) {
 }
 
 //Header---------
-export function WorkHeader() {
+export function WorkHeader({ navigation }) {
     return (
         <View style={styles.homeHeader}>
+            <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.navigate('HomeStack')} >
+                <Icon name='home' size={25} color='white' />
+            </TouchableOpacity>
             <Text style={styles.homeHeaderText}>Your Work</Text>
+            <TouchableOpacity style={styles.headerRight} onPress={() => navigation.navigate('GotoWorkDrawer')} >
+                <Icon name='folder-open' size={25} color='white' />
+            </TouchableOpacity>
         </View >
     )
 }
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        left: -30,
+        //left: -30,
         //backgroundColor: '#2b44bd',
         //width: 100,
     },
@@ -208,12 +208,13 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 5,
         //backgroundColor: 'black',
-        padding: 7,
-        //borderRadius: 10
+        //padding: 7,
+        //borderRadius: 10,
     },
     homeHeaderText: {
         fontSize: 23,
-    }
+        color: 'white'
+    },
 });
 
 export default WorkScreen;

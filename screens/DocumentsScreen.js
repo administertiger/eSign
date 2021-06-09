@@ -1,18 +1,56 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, Button, ActivityIndicator, Modal, Dimensions } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import Pdf from 'react-native-pdf';
 import RNFetchBlob from 'rn-fetch-blob'
+import base64 from 'base64-js'
+import { authorize } from 'react-native-app-auth';
+import { Configs } from '../components/configs';
+
+const initialState = {
+    hasLoggedInOnce: false,
+    provider: '',
+    accessToken: '',
+    accessTokenExpirationDate: '',
+    refreshToken: ''
+};
 
 function DocumentsScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
 
+    const [authState, setAuthState] = useState(initialState);
+    const [showModalPdf, setShowModalPdf] = useState(false);
+
     useEffect(() => {
+        //handleAuthorize(Configs.adb2c);
         getList();
     }, []);
+
+    //---------------------------Get user token-------------------------
+    const handleAuthorize = useCallback(
+        async provider => {
+            try {
+                //const config = Configs[provider];
+                const config = provider
+                const newAuthState = await authorize(config);
+
+                setAuthState({
+                    hasLoggedInOnce: false,
+                    provider: provider,
+                    ...newAuthState
+                });
+
+                getList(newAuthState.accessToken);
+                console.log('User token: ', newAuthState);
+
+            } catch (error) {
+                Alert.alert('Failed to log in', error.message);
+            }
+        }
+    );
 
     //-----------------------Get & Limit list items---------------------
     const [documents, setDocuments] = useState([]);
@@ -97,21 +135,25 @@ function DocumentsScreen({ navigation }) {
         RNFetchBlob.config(options)
             .fetch('GET', "https://ws.esigns.cloud/files/" + item.id, { 'Authorization': 'Bearer ' + global.token, })
             .then((res) => {
-                //console.log("Success = ", res);
+                console.log("Success = ", res);
             })
             .catch((err) => { console.log('error', err) }) // To execute when download cancelled and other errors
     }
+
     //----------------------Render Items---------------------------
 
     function RenderItem({ item }) {
         return (
-            <View style={{ borderBottomWidth: 1, marginBottom: 30 }}>
+            <View style={{ borderBottomWidth: 1, marginBottom: 25, paddingBottom: 10 }}>
                 <View style={styles.listBox}>
                     <Text numberOfLines={1} style={styles.listText}>{item.file.displayName}</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-
+                        <TouchableOpacity>
+                            <Icon name='search' color='black' size={25} />
+                        </TouchableOpacity>
+                        <Text>       </Text>
                         <TouchableOpacity onPress={() => handleDownload(item)}>
-                            <Icon name='download' color='black' size={20} />
+                            <Icon name='download' color='black' size={25} />
                         </TouchableOpacity>
                         <Text>   </Text>
                         <Menu>
@@ -152,7 +194,6 @@ function DocumentsScreen({ navigation }) {
         <MenuProvider>
             <View style={styles.box}>
                 <Text style={styles.header}>Your Documents</Text>
-                <Button title='refresh' onPress={getList} />
                 <Text />
                 <FlatList
                     data={documents.slice(0, itemCount)}
@@ -180,7 +221,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     listText: {
-        width: 250,
+        width: 230,
         fontSize: 25,
         fontFamily: 'Verdana'
     },
