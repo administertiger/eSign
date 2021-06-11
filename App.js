@@ -1,9 +1,10 @@
 import React from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, useHeaderHeight } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
@@ -32,7 +33,8 @@ const Drawer = createDrawerNavigator();
 function DrawerNavigator() {
     return (
         <Drawer.Navigator initialRouteName='HomeDrawer' drawerType='slide' drawerContent={props => <SideBar {...props} />} >
-            <Drawer.Screen name="HomeDrawer" component={HomeStack} />
+            <Drawer.Screen name="HomeDrawer" component={HomeStack} options={{ unmountOnBlur: true, }} />
+            <Drawer.Screen name="DocumentsDrawer" component={DocumentsStack} options={{ unmountOnBlur: true, }} />
             <Drawer.Screen name="AboutDrawer" component={AboutStack} />
             <Drawer.Screen name='CertificateDrawer' component={CertificateStack} />
             <Drawer.Screen name='GotoWorkDrawer' component={GoToWork} options={{ unmountOnBlur: true }} />
@@ -49,7 +51,49 @@ function TabNavigator() {
             showLabel: false,
             style: {
                 position: 'absolute',
-                marginHorizontal: 20
+                marginHorizontal: 10,
+                //bottom: 20,
+                height: 55,
+                borderTopStartRadius: 5,
+                borderTopEndRadius: 5,
+                elevation: 3
+            },
+
+        }}>
+            <Tab.Screen name='HomeTab' component={HomeScreen}
+                options={{
+                    tabBarIcon: ({ focused }) => (
+                        <View style={{ alignItems: 'center', }}>
+                            <Icon name='home' style={{ color: focused ? `#e32f45` : `#748c94`, }} />
+                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>HOME</Text>
+                        </View>
+                    ),
+                }} />
+            <Tab.Screen name='DocumentsTab' component={DocumentsScreen}
+                options={{
+                    tabBarIcon: ({ focused }) => (
+                        <View style={{ alignItems: 'center' }}>
+                            <Icon name='folder' style={{ color: focused ? `#e32f45` : `#748c94`, }} />
+                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>DOCUMENTS</Text>
+                        </View>
+                    ),
+                    unmountOnBlur: true,
+                }} />
+        </Tab.Navigator>
+    )
+}
+function TabNavigator2() {
+    return (
+        <Tab.Navigator initialRouteName='DocumentsTab' tabBarOptions={{
+            showLabel: false,
+            style: {
+                position: 'absolute',
+                marginHorizontal: 10,
+                //bottom: 20,
+                height: 55,
+                borderTopStartRadius: 5,
+                borderTopEndRadius: 5,
+                elevation: 3
             },
 
         }}>
@@ -78,6 +122,9 @@ function TabNavigator() {
 
 //----------Stacks----------
 function HomeStack({ navigation }) {
+    const headerHeight = useHeaderHeight();
+    const headerWidth = Dimensions.get('window').width;
+
     return (
         <Stack.Navigator >
             <Stack.Screen name='HomeStack' component={TabNavigator}
@@ -85,9 +132,33 @@ function HomeStack({ navigation }) {
                     {
                         headerTitle: () => <HomeHeader navigation={navigation} />,
                         headerLeft: null,
-                        headerStyle: {
-                            backgroundColor: '#3944BC'
-                        }
+                        headerBackground: () => <LinearGradient
+                            colors={['#2C5364', '#99f2c8']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 2, y: 0 }}
+                            style={{ width: headerWidth, height: headerHeight, }} />
+
+                    }} />
+        </Stack.Navigator>
+
+    )
+}
+function DocumentsStack({ navigation }) {
+    const headerHeight = useHeaderHeight();
+    const headerWidth = Dimensions.get('window').width;
+
+    return (
+        <Stack.Navigator >
+            <Stack.Screen name='DocumentsStack' component={TabNavigator2}
+                options={
+                    {
+                        headerTitle: () => <HomeHeader navigation={navigation} />,
+                        headerLeft: null,
+                        headerBackground: () => <LinearGradient
+                            colors={['#2C5364', '#99f2c8']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 2, y: 0 }}
+                            style={{ width: headerWidth, height: headerHeight, }} />
 
                     }} />
         </Stack.Navigator>
@@ -96,18 +167,29 @@ function HomeStack({ navigation }) {
 }
 
 function AboutStack({ navigation }) {
+    const headerHeight = useHeaderHeight();
+    const headerWidth = Dimensions.get('window').width;
+
     return (
         <Stack.Navigator>
             <Stack.Screen name='AboutStack' component={AboutScreen}
                 options={
                     {
                         headerTitle: () => <AboutHeader navigation={navigation} />,
-                        headerLeft: null
+                        headerLeft: null,
+                        headerBackground: () => <LinearGradient
+                            colors={['#2C5364', '#99f2c8']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 2, y: 0 }}
+                            style={{ width: headerWidth, height: headerHeight, }} />
                     }} />
         </Stack.Navigator>
     )
 }
 function CertificateStack({ navigation }) {
+    const headerHeight = useHeaderHeight();
+    const headerWidth = Dimensions.get('window').width;
+
     return (
         <Stack.Navigator>
             <Stack.Screen name='CertificateStack' component={Certificate}
@@ -115,11 +197,19 @@ function CertificateStack({ navigation }) {
                     {
                         headerTitle: () => <CertificateHeader navigation={navigation} />,
                         headerLeft: null,
+                        headerBackground: () => <LinearGradient
+                            colors={['#2C5364', '#99f2c8']}
+                            start={{ x: 0.1, y: 0 }}
+                            end={{ x: 2, y: 0 }}
+                            style={{ width: headerWidth, height: headerHeight, }} />
                     }} />
         </Stack.Navigator>
     )
 }
 function WorkStack({ navigation }) {
+    const headerHeight = useHeaderHeight();
+    const headerWidth = Dimensions.get('window').width;
+
     return (
         <Stack.Navigator>
             <Stack.Screen
@@ -129,9 +219,11 @@ function WorkStack({ navigation }) {
                     {
                         headerTitle: () => <WorkHeader navigation={navigation} />,
                         headerLeft: null,
-                        headerStyle: {
-                            backgroundColor: '#3944BC'
-                        },
+                        headerBackground: () => <LinearGradient
+                            colors={['#2C5364', '#99f2c8']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 2, y: 0 }}
+                            style={{ width: headerWidth, height: headerHeight, }} />
                     }}
             />
         </Stack.Navigator>
@@ -151,7 +243,7 @@ const App = () => {
                         }} />
 
                 <Stack.Screen
-                    name='HomeScreen'
+                    name='MainScreen'
                     component={DrawerNavigator}
                     options={
                         {
@@ -161,13 +253,10 @@ const App = () => {
                 />
 
 
+
             </Stack.Navigator>
         </NavigationContainer>
     )
 }
-
-const styles = StyleSheet.create({
-
-})
 
 export default App;

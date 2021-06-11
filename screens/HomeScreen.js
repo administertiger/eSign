@@ -1,25 +1,107 @@
-import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import axios from 'axios';
-import { authorize } from 'react-native-app-auth';
-import { Configs } from '../components/configs';
+
+var fullWidth = Dimensions.get('window').width; //full width
 
 function HomeScreen({ navigation }) {
+    const API_URL = 'https://ws.esigns.cloud';
+
+    useEffect(() => {
+        getList();
+        getUserProfile();
+    }, []);
+
+    const [documents, setDocuments] = useState([]);
+    const [certificates, setCertificates] = useState([]);
+
+    //--------------------Get documents--------------------
+    function getList() {
+        axios.get(API_URL + '/documents',  //Documents API
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + global.token
+                }
+            })
+            .then((response) => {
+                console.log('response = ', response);
+                if (response.data) {
+                    //console.log('Documents List: ', response.data);
+
+                    const data = response.data;
+                    const getFile = data.map((data) => data); //Get file data
+                    const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
+
+                    //Merge File docs array and Certification array togethor.
+                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
+                    console.log('documents2 = ', merge)
+                    setDocuments(merge);
+                }
+
+            }, (error) => {
+                console.log(error);
+            })
+    }
+
+    //-----------------------Get Certificates-----------------------
+    function getUserProfile() {
+        axios.get(API_URL + '/accounts',  //Account API
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + global.token
+                }
+            })
+            .then((response) => {
+                console.log(response);
+                if (response.data) {
+                    setCertificates(response.data.certificates)
+                }
+
+            }, (error) => {
+                console.log(error);
+
+            })
+    }
+
+    function renderItem({ item }) {
+        return (
+            <TouchableOpacity style={styles.renderBox}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={styles.renderText} numberOfLines={1}>{item.file.displayName}</Text>
+                    <Text>{item.signedTime}</Text>
+                </View>
+                <Text style={{ opacity: 0.5, color: 'black' }}>{item.certificateName}</Text>
+            </TouchableOpacity>
+        )
+    }
 
     return (
         <View style={{ flex: 1 }}>
 
             <View style={styles.box}>
-                <Text style={styles.text}>Welcome {global.firstName} {global.lastName}</Text>
-                <Text style={{ textAlign: 'center', fontSize: 17 }}>{global.email}</Text>
-                <Text style={{ textAlign: 'center' }}>{global.country}</Text>
-                <TouchableOpacity style={{ paddingVertical: 10, }}>
-                    <Text style={{ textAlign: 'center', color: 'blue' }}>edit profile</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', paddingTop: 5 }}>
+                    <TouchableOpacity style={styles.showCount} onPress={() => navigation.navigate('DocumentsTab')}>
+                        <Text style={{ fontSize: 30, color: 'blue', opacity: 0.7 }}>{documents.length}</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Documents</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.showCount} onPress={() => navigation.navigate('CertificateDrawer')}>
+                        <Text style={{ fontSize: 30, color: 'blue', opacity: 0.7 }}>{certificates.length}</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Certificate</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <Text style={{ padding: 10, paddingTop: 5, paddingStart: 17, fontSize: 20 }}>Your recent activity</Text>
+
+                <View style={{ justifyContent: 'center', alignItems: 'center', marginHorizontal: 15, backgroundColor: 'white', }}>
+
+                    <FlatList data={documents.slice(0, 5)} renderItem={renderItem} />
+
+                </View>
                 <View style={styles.workBox}>
                     <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkDrawer') }} >
-                        <Text>
+                        <Text style={{ color: 'black' }}>
                             <Icon name='plus' /> NEW WORKFLOW
                             </Text>
                     </TouchableOpacity>
@@ -50,15 +132,16 @@ const styles = StyleSheet.create({
         marginBottom: 70,
     },
     button: {
-        borderWidth: 2,
+        //borderWidth: 2,
         alignItems: 'center',
         justifyContent: 'center',
-        margin: 30,
-        //marginBottom: 80,
+        marginHorizontal: 30,
+        marginBottom: 10,
         height: 60,
-        borderRadius: 4,
-        borderStyle: 'dashed',
-        backgroundColor: 'rgba(117, 124, 136, 0.2)'
+        //borderRadius: 10,
+        //borderStyle: 'dashed',
+        backgroundColor: '#d1d1d1',
+        elevation: 5,
     },
     workBox: {
         //borderWidth: 1,
@@ -73,6 +156,35 @@ const styles = StyleSheet.create({
         fontFamily: 'sans-serif-medium',
         fontWeight: 'bold',
     },
+    showCount: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        //borderWidth: 1,
+        flex: 1,
+        //paddingVertical: 50,
+        margin: 20,
+        borderRadius: 5,
+        backgroundColor: 'white',
+        height: 100,
+        elevation: 3,
+    },
+    renderText: {
+        fontSize: 17,
+        width: 180
+    },
+    renderBox: {
+        //borderWidth: 1,
+        marginVertical: 4,
+        //marginHorizontal: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        //width: fullWidth,
+        //right: 5,
+        backgroundColor: 'white',
+        elevation: 3,
+
+    },
+
     //Header---------
     homeHeader: {
         flexDirection: 'row',

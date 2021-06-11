@@ -22,6 +22,8 @@ target 'Example' do
 
   pod 'RNFS', :path => '../node_modules/react-native-fs'
 
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
   target 'ExampleTests' do
     inherit! :complete
     # Pods for testing

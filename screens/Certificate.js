@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import Icon2 from 'react-native-vector-icons/dist/FontAwesome5';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
 import * as RNFS from 'react-native-fs';
@@ -189,7 +190,9 @@ function Certificate() {
     }
 
     //---------------------------Delete certificate---------------------------
+
     function DeleteCertificate(id) {
+        setDeleteMoadlState(false);
 
         setUploadModalLoading(true);
         axios({
@@ -240,8 +243,8 @@ function Certificate() {
         }
 
         return (
-            <View style={styles.renderBox}>
-                <Text numberOfLines={1} style={{ width: 230, fontSize: 17, fontWeight: 'bold' }} >{item.certificateName}</Text>
+            <TouchableOpacity style={styles.renderBox}>
+                <Text numberOfLines={1} style={{ width: 230, fontSize: 17, }} >{item.certificateName}</Text>
                 <View style={{ flexDirection: 'row' }}>
                     <TouchableOpacity onPress={() => changeCertification(item.id)} >
                         <Icon name='check-circle' size={40} />
@@ -251,7 +254,7 @@ function Certificate() {
                         <Icon name='times-circle' size={40} />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </TouchableOpacity >
         )
     }
 
@@ -269,7 +272,7 @@ function Certificate() {
 
     function renderFooter() {
         return (
-            <View style={styles.loader}>
+            <View>
                 <ActivityIndicator size='large' color='black' animating={footerLoading} />
             </View>
         )
@@ -305,18 +308,25 @@ function Certificate() {
                             value={text}
                         />
                         <View style={{ flexDirection: 'row', paddingTop: 5 }}>
-                            <Button title='submit' onPress={() => handleSubmit()} />
+                            <Button title='   submit   ' onPress={() => handleSubmit()} />
                             <Text>  </Text>
-                            <Button title='cancel' onPress={() => CancleModal()} />
+                            <Button title='   cancel   ' onPress={() => CancleModal()} />
                         </View>
                     </View>
                 </View>
             </Modal>
             <View style={{ paddingVertical: 10 }}>
-                <Text style={styles.headerText}>Your Current Certificate</Text>
-                <View style={{ borderTopWidth: 1, borderBottomWidth: 1, marginHorizontal: 15, paddingVertical: 10, marginTop: 10, }}>
-                    <Text style={styles.headerText}>{currentCertificate.certificateName}</Text>
+                <View style={{ marginHorizontal: 15 }}>
+                    <Text style={styles.headerText}>My Certificates</Text>
                 </View>
+
+                <View style={{ borderTopWidth: 1, marginTop: 10, marginHorizontal: 15, }} />
+
+                <TouchableOpacity style={{ paddingVertical: 10 }}>
+                    <Text style={{ fontSize: 20, textAlign: 'center', }}>{currentCertificate.certificateName}</Text>
+                </TouchableOpacity>
+
+                <View style={{ borderTopWidth: 1, marginBottom: 10, marginHorizontal: 15, }} />
             </View>
             <View style={styles.showCertificate}>
                 <FlatList data={certificate}
@@ -341,9 +351,9 @@ export function CertificateHeader({ navigation }) {
     return (
         <View style={styles.homeHeader}>
             <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.openDrawer()} >
-                <Icon name='align-left' size={25} color='black' />
+                <Icon name='align-left' size={25} color='white' />
             </TouchableOpacity>
-            <Text style={styles.homeHeaderText}>Certification</Text>
+            <Text style={styles.homeHeaderText}><Icon2 name='pen-nib' size={25} />  Certificates</Text>
         </View >
     )
 }
@@ -376,7 +386,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     headerText: {
-        fontSize: 20,
+        fontSize: 25,
         fontWeight: 'bold',
         //paddingVertical: 20,
         //paddingLeft: 20,
@@ -428,18 +438,23 @@ const styles = StyleSheet.create({
     },
     homeHeaderText: {
         fontSize: 23,
+        color: 'white',
     },
     //Render items-------
     renderBox: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderWidth: 1,
+        //borderWidth: 1,
         borderRadius: 10,
-        marginBottom: 10,
+        marginBottom: 15,
         padding: 10,
         height: 80,
         paddingHorizontal: 15,
+        backgroundColor: 'white',
+        elevation: 5,
+        //shadowRadius: 50,
+
     }
 })
 

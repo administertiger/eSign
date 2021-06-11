@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, Button, ActivityIndicator, Modal, Dimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Modal, Dimensions } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
@@ -10,47 +10,14 @@ import base64 from 'base64-js'
 import { authorize } from 'react-native-app-auth';
 import { Configs } from '../components/configs';
 
-const initialState = {
-    hasLoggedInOnce: false,
-    provider: '',
-    accessToken: '',
-    accessTokenExpirationDate: '',
-    refreshToken: ''
-};
-
 function DocumentsScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
-
-    const [authState, setAuthState] = useState(initialState);
-    const [showModalPdf, setShowModalPdf] = useState(false);
 
     useEffect(() => {
         //handleAuthorize(Configs.adb2c);
         getList();
+
     }, []);
-
-    //---------------------------Get user token-------------------------
-    const handleAuthorize = useCallback(
-        async provider => {
-            try {
-                //const config = Configs[provider];
-                const config = provider
-                const newAuthState = await authorize(config);
-
-                setAuthState({
-                    hasLoggedInOnce: false,
-                    provider: provider,
-                    ...newAuthState
-                });
-
-                getList(newAuthState.accessToken);
-                console.log('User token: ', newAuthState);
-
-            } catch (error) {
-                Alert.alert('Failed to log in', error.message);
-            }
-        }
-    );
 
     //-----------------------Get & Limit list items---------------------
     const [documents, setDocuments] = useState([]);
@@ -58,7 +25,8 @@ function DocumentsScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(true)
 
     function getList() {
-        axios.get(API_URL + '/documents',  //Documents API
+
+        axios.get(API_URL + '/documents', //Documents API
             {
                 headers: {
                     'Authorization': 'Bearer ' + global.token
@@ -229,7 +197,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         paddingVertical: 15,
         fontSize: 25,
-        fontWeight: 'bold',
+        //fontWeight: 'bold',
     },
     //--------------Menu--------------
 

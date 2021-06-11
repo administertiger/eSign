@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Dimensions, View, Text, Button, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Dimensions, View, Text, ActivityIndicator, TouchableOpacity, Alert, Modal } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import axios from 'axios';
 
 import Pdf from 'react-native-pdf';
@@ -9,7 +10,8 @@ import Pdf from 'react-native-pdf';
 function WorkScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
 
-    const [file, setFile] = useState([])
+    const [file, setFile] = useState({})
+    const [loading, setLoading] = useState(false)
 
     //------------------------handle choos file--------------------------
 
@@ -33,7 +35,7 @@ function WorkScreen({ navigation }) {
             if (DocumentPicker.isCancel(err)) {
                 //If user canceled the document selection
                 alert('Canceled from single doc picker');
-                navigation.navigate('HomeStack')
+                navigation.navigate('HomeDrawer')
             } else {
                 //For Unknown Error
                 alert('Unknown Error: ' + JSON.stringify(err));
@@ -71,6 +73,7 @@ function WorkScreen({ navigation }) {
     //----------------------handleUploadFile----------------------
     function handleUploadFile() {
         console.log('file = ', file);
+        setLoading(true);
 
         let formData = new FormData();
         formData.append('file', file);
@@ -100,11 +103,13 @@ function WorkScreen({ navigation }) {
                             clearInterval(myInterval);
                             console.log('Complete!')
                             Alert.alert('complete')
-                            navigation.navigate('DocumentsTab')
+                            setLoading(false);
+                            navigation.navigate('DocumentsDrawer')
                         } else if (response.data.status === 'fail') {
                             clearInterval(myInterval);
                             console.log('Fail T_T')
                             Alert.alert('Fail T_T')
+                            setLoading(false);
                         }
                     }), (error) => {
                         console.log(error);
@@ -120,11 +125,19 @@ function WorkScreen({ navigation }) {
         <View style={styles.container} >
             {file.uri ? (
                 <View >
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={loading}>
+                        <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)', flex: 1, justifyContent: 'center' }}>
+                            <ActivityIndicator size='large' color='white' animating={true} />
+                        </View>
+                    </Modal>
                     <ShowPdf />
                     <View style={styles.singButtonBox} >
                         <TouchableOpacity style={styles.singButton} onPress={() => handleUploadFile()}>
                             <Text style={styles.signText}>Sign </Text>
-                            <Icon name='pencil' size={20} />
+                            <Icon2 name='file-signature' size={20} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -137,7 +150,7 @@ function WorkScreen({ navigation }) {
 export function WorkHeader({ navigation }) {
     return (
         <View style={styles.homeHeader}>
-            <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.navigate('HomeStack')} >
+            <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.navigate('HomeDrawer')} >
                 <Icon name='home' size={25} color='white' />
             </TouchableOpacity>
             <Text style={styles.homeHeaderText}>Your Work</Text>
@@ -176,7 +189,8 @@ const styles = StyleSheet.create({
         height: 50,
         width: 250,
         borderRadius: 10,
-        backgroundColor: 'rgba(196, 196, 196, 0.7)'
+        backgroundColor: '#d1d1d1',
+        elevation: 3,
     },
     signText: {
         fontSize: 20,

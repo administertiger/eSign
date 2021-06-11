@@ -35,7 +35,8 @@ function LoginScreen({ navigation }) {
                     global.lastName = response.data.profiles.lastName;
                     global.name = response.data.profiles.name
 
-                    console.log('Profile set!!', global.name)
+                    console.log('Profile set!!', global.name);
+                    navigation.navigate('MainScreen');
                 }
 
             }, (error) => {
@@ -68,11 +69,7 @@ function LoginScreen({ navigation }) {
         }
     );
 
-    function timeoutNavigate() {
-        setTimeout(() => {
-            navigation.navigate('HomeScreen')
-        }, 6000)
-    }
+
 
     //------------------------------------------------------
 
@@ -81,7 +78,7 @@ function LoginScreen({ navigation }) {
             {!!authState.accessToken ? (
                 <View>
                     <ActivityIndicator size='large' color='black' />
-                    <Text style={styles.text} onPress={timeoutNavigate()}>Bringing you to the homepage...</Text>
+                    <Text style={styles.text}>Bringing you to the homepage...</Text>
                 </View>
             ) : null}
             <View style={{ justifyContent: 'center' }}>

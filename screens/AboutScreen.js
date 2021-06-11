@@ -16,14 +16,23 @@ export function AboutHeader({ navigation }) {
     return (
         <View style={styles.homeHeader}>
             <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.openDrawer()} >
-                <Icon name='align-left' size={25} color='black' />
+                <Icon name='align-left' size={25} color='white' />
             </TouchableOpacity>
-            <Text style={styles.homeHeaderText}>About this App</Text>
+            <Text style={styles.homeHeaderText}><Icon name='info-circle' size={30} />  About this App</Text>
         </View >
     )
 }
 
 const styles = StyleSheet.create({
+    linearGradient: {
+        //flex: 1,
+        paddingLeft: 15,
+        paddingRight: 15,
+        borderRadius: 5,
+        height: 30,
+        width: 70,
+    },
+
     box: {
         flex: 1,
         //justifyContent: 'center',
@@ -50,6 +59,7 @@ const styles = StyleSheet.create({
     },
     homeHeaderText: {
         fontSize: 23,
+        color: 'white',
     }
 })
 
