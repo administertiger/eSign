@@ -1,25 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, Alert, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon2 from 'react-native-vector-icons/dist/FontAwesome5';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
 import * as RNFS from 'react-native-fs';
 import base64 from 'react-native-base64'
+import { useTranslation } from 'react-i18next';
 
 const forge = require('node-forge');
 
 function Certificate() {
     const API_URL = 'https://ws.esigns.cloud';
 
+    const { t, i18n } = useTranslation();
+
     const [certificate, setCertificate] = useState([]);
     const [text, onChangeText] = useState('');
     const [selectedFile, setSelectedFile] = useState({});
     const [currentCertificate, setCerrentCertificate] = useState({})
+    const [currentCertificateDate, setCurrentCertificateDate] = useState({})
 
     //Modal
-    const [uploadModalLoading, setUploadModalLoading] = useState(false)
-    const [passwordModalState, setPasswordModalState] = useState(false)
+    const [uploadModalLoading, setUploadModalLoading] = useState(false);
+    const [passwordModalState, setPasswordModalState] = useState(false);
+    const [detailModal, setDetailModal] = useState(false);
+    const [p12lModal, setP12Modal] = useState(false);
+    const [emptyPasswordlModal, setEmptyPasswordModal] = useState(false);
+    const [invalidPasswordlModal, setInvalidPasswordModal] = useState(false);
+    const [successModal, setSuccessModal] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
+
 
     useState(() => {
         getUserProfile();
@@ -28,7 +39,6 @@ function Certificate() {
     useEffect(() => {
         console.log('password = ', text);
     }, [text])
-
 
     //--------------------Get current certification.------------------
     function getUserProfile() {
@@ -50,8 +60,15 @@ function Certificate() {
                     const testCer = response.data.certificates
                     const obj = testCer.find(item => item.id === response.data.settings.defaultCertificateId)
                     console.log('obj = ', obj)
+                    console.log('obj validity = ', obj.validity)
                     console.log('Current certificate = ', obj.certificateName)
                     setCerrentCertificate(obj);
+                    const createTimeFormat = obj.validity.notBefore[11] + obj.validity.notBefore[12] + obj.validity.notBefore[13] + obj.validity.notBefore[14] + obj.validity.notBefore[15] + obj.validity.notBefore[16] + obj.validity.notBefore[17] + obj.validity.notBefore[18]
+                    const createDateFormat = obj.validity.notBefore[8] + obj.validity.notBefore[9] + '/' + obj.validity.notBefore[5] + obj.validity.notBefore[6] + '/' + obj.validity.notBefore[0] + obj.validity.notBefore[1] + obj.validity.notBefore[2] + obj.validity.notBefore[3]
+                    const expireDateFormat = obj.validity.notAfter[8] + obj.validity.notAfter[9] + '/' + obj.validity.notAfter[5] + obj.validity.notAfter[6] + '/' + obj.validity.notAfter[0] + obj.validity.notAfter[1] + obj.validity.notAfter[2] + obj.validity.notAfter[3]
+                    const expireTimeFormat = obj.validity.notAfter[11] + obj.validity.notAfter[12] + obj.validity.notAfter[13] + obj.validity.notAfter[14] + obj.validity.notAfter[15] + obj.validity.notAfter[16] + obj.validity.notAfter[17] + obj.validity.notAfter[18]
+                    setCurrentCertificateDate({ 'notBefore': createDateFormat + ' ' + createTimeFormat, 'notAfter': expireDateFormat + ' ' + expireTimeFormat })
+                    console.log(currentCertificateDate);
 
 
                 }
@@ -82,7 +99,7 @@ function Certificate() {
                 setPasswordModalState(true)
             } else {
                 console.log('Wrong file type');
-                Alert.alert('Please choose only p12 file')
+                setP12Modal(true)
                 setSelectedFile({})
 
             }
@@ -124,8 +141,8 @@ function Certificate() {
             getUserProfile();
             setSelectedFile({});
             setUploadModalLoading(false);
-            Alert.alert('Upload success!')
-
+            //Alert.alert('Upload success!')
+            setSuccessModal(true);
         }, (error) => {
             console.log(error);
             console.log('Upload Fail T_T')
@@ -168,6 +185,7 @@ function Certificate() {
                         setPasswordModalState(false);
                         uploadFile();
                         setUploadModalLoading(true);
+                        onChangeText('')
                     }
 
                 } catch (error) {
@@ -175,8 +193,10 @@ function Certificate() {
                     console.log(error);
                     console.log('Fail!555');
                     setPasswordModalState(false);
-                    Alert.alert('Invalid password')
-                    setSelectedFile({})
+                    //Alert.alert('Invalid password')
+                    setInvalidPasswordModal(true);
+                    setSelectedFile({});
+                    onChangeText('');
 
                 };
             })
@@ -185,15 +205,14 @@ function Certificate() {
                 });
         } else {
             console.log('Type the password')
-            Alert.alert('Type the password')
+            //Alert.alert('Type the password')
+            setEmptyPasswordModal(true);
         }
     }
 
     //---------------------------Delete certificate---------------------------
 
     function DeleteCertificate(id) {
-        setDeleteMoadlState(false);
-
         setUploadModalLoading(true);
         axios({
             method: 'DELETE',
@@ -204,8 +223,8 @@ function Certificate() {
         }).then((response) => {
             console.log('delete = ', response)
             getUserProfile();
-            Alert.alert('Delete!')
-
+            //Alert.alert('Delete!')
+            setDeleteModal(true);
         }, (error) => {
             console.log(error);
             console.log('Upload Fail T_T')
@@ -236,25 +255,57 @@ function Certificate() {
         })
     }
 
+    function Detail() {
+        setDetailModal(true)
+    }
+
     //----------------Render flatlist------------------
     function renderItem({ item }) {
+
+        const createDateFormat = item.validity.notBefore[8] + item.validity.notBefore[9] + '/' + item.validity.notBefore[5] + item.validity.notBefore[6] + '/' + item.validity.notBefore[0] + item.validity.notBefore[1] + item.validity.notBefore[2] + item.validity.notBefore[3]
+        const createTimeFormat = item.validity.notBefore[11] + item.validity.notBefore[12] + item.validity.notBefore[13] + item.validity.notBefore[14] + item.validity.notBefore[15] + item.validity.notBefore[16] + item.validity.notBefore[17] + item.validity.notBefore[18]
+        const expireDateFormat = item.validity.notAfter[8] + item.validity.notAfter[9] + '/' + item.validity.notAfter[5] + item.validity.notAfter[6] + '/' + item.validity.notAfter[0] + item.validity.notAfter[1] + item.validity.notAfter[2] + item.validity.notAfter[3]
+        const expireTimeFormat = item.validity.notAfter[11] + item.validity.notAfter[12] + item.validity.notAfter[13] + item.validity.notAfter[14] + item.validity.notAfter[15] + item.validity.notAfter[16] + item.validity.notAfter[17] + item.validity.notAfter[18]
+
         if (item.id === currentCertificate.id) {
             return <View />
         }
 
         return (
-            <TouchableOpacity style={styles.renderBox}>
-                <Text numberOfLines={1} style={{ width: 230, fontSize: 17, }} >{item.certificateName}</Text>
-                <View style={{ flexDirection: 'row' }}>
-                    <TouchableOpacity onPress={() => changeCertification(item.id)} >
-                        <Icon name='check-circle' size={40} />
-                    </TouchableOpacity>
-                    <Text>  </Text>
-                    <TouchableOpacity onPress={() => DeleteCertificate(item.id)} >
-                        <Icon name='times-circle' size={40} />
-                    </TouchableOpacity>
-                </View>
-            </TouchableOpacity >
+            <View>
+                <View style={styles.renderBox}>
+                    <View>
+                        <Text numberOfLines={1} style={{ width: 230, fontSize: 20, }} >{item.certificateName}</Text>
+                        <View style={{ paddingLeft: 5 }}>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.headerDetail}>{t('Serial number')}: </Text>
+                                <Text style={styles.detail}>{item.serialNumber}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.headerDetail}>{t('Email')}: </Text>
+                                <Text style={styles.detail}>{item.email}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.headerDetail}>{t('Start date')}: </Text>
+                                <Text style={styles.detail}>{createDateFormat} {createTimeFormat}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.headerDetail}>{t('Expired date')}: </Text>
+                                <Text style={styles.detail}>{expireDateFormat} {expireTimeFormat}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={{ flexDirection: 'row' }}>
+                        <TouchableOpacity onPress={() => changeCertification(item.id)} >
+                            <Icon name='check-circle' size={40} />
+                        </TouchableOpacity>
+                        <Text>  </Text>
+                        <TouchableOpacity onPress={() => DeleteCertificate(item.id)} >
+                            <Icon name='times-circle' size={40} />
+                        </TouchableOpacity>
+                    </View>
+                </View >
+            </View >
         )
     }
 
@@ -284,6 +335,7 @@ function Certificate() {
 
     return (
         <View style={{ flex: 1 }}>
+            {/* uploadModalLoading */}
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -294,6 +346,7 @@ function Certificate() {
                     </View>
                 </View>
             </Modal>
+            {/* passwordModalState */}
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -301,28 +354,138 @@ function Certificate() {
             >
                 <View style={styles.modalContainer}>
                     <View style={styles.modalBox}>
-                        <Text>Password</Text>
+                        <Text style={styles.fileName}>{selectedFile.name}</Text>
+                        <Text>{t('Password')}</Text>
                         <TextInput
                             style={styles.input}
                             onChangeText={onChangeText}
                             value={text}
                         />
                         <View style={{ flexDirection: 'row', paddingTop: 5 }}>
-                            <Button title='   submit   ' onPress={() => handleSubmit()} />
+                            <Button title={t('Submit')} onPress={() => handleSubmit()} />
                             <Text>  </Text>
-                            <Button title='   cancel   ' onPress={() => CancleModal()} />
+                            <Button title={t('Cancel')} onPress={() => CancleModal()} />
                         </View>
                     </View>
                 </View>
             </Modal>
-            <View style={{ paddingVertical: 10 }}>
-                <View style={{ marginHorizontal: 15 }}>
-                    <Text style={styles.headerText}>My Certificates</Text>
+            {/* detailModal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={detailModal}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', }}>
+                    <View style={styles.modalBox}>
+                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ fontSize: 20, textAlign: 'center', paddingBottom: 5 }} >{currentCertificate.certificateName}</Text>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.headerDetail}>{t('Serial number')}: </Text>
+                                <Text style={styles.detail}>{currentCertificate.serialNumber}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.headerDetail}>{t('Email')}: </Text>
+                                <Text style={styles.detail}>{currentCertificate.email}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.headerDetail}>{t('Start date')}: </Text>
+                                <Text style={styles.detail}>{currentCertificateDate.notBefore}</Text>
+                            </View>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={styles.headerDetail}>{t('Expired date')}: </Text>
+                                <Text style={styles.detail}>{currentCertificateDate.notAfter}</Text>
+                            </View>
+                        </View>
+                        <View style={{ paddingTop: 10 }}>
+                            <Button title='         OK         ' onPress={() => setDetailModal(false)} />
+                        </View>
+                    </View>
                 </View>
+            </Modal>
+            {/* p12lModal */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={p12lModal}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={styles.alertText}>{t('Please choose only p12 file')}</Text>
+                        <View style={styles.alertButton}>
+                            <TouchableOpacity onPress={() => setP12Modal(false)}>
+                                <Text style={styles.alertText}>{t('Ok')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* emptyPasswordlModal */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={emptyPasswordlModal}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={styles.alertText}>{t('Type the password')}</Text>
+                        <View style={styles.alertButton}>
+                            <TouchableOpacity onPress={() => setEmptyPasswordModal(false)}>
+                                <Text style={styles.alertText}>{t('Ok')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* invalidPasswordlModal */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={invalidPasswordlModal}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={styles.alertText}>{t('Invalid password')}</Text>
+                        <View style={styles.alertButton}>
+                            <TouchableOpacity onPress={() => setInvalidPasswordModal(false)}>
+                                <Text style={styles.alertText}>{t('Ok')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* successModal */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={successModal}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={styles.alertText}>{t('SuccessCertificate')}</Text>
+                        <View style={styles.alertButton}>
+                            <TouchableOpacity onPress={() => setSuccessModal(false)}>
+                                <Text style={styles.alertText}>{t('Ok')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+            {/* deleteModal */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={deleteModal}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={styles.alertText}>{t('DeleteCertificate')}</Text>
+                        <View style={styles.alertButton}>
+                            <TouchableOpacity onPress={() => setDeleteModal(false)}>
+                                <Text style={styles.alertText}>{t('Ok')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
+            <View style={{ paddingVertical: 10 }}>
                 <View style={{ borderTopWidth: 1, marginTop: 10, marginHorizontal: 15, }} />
 
-                <TouchableOpacity style={{ paddingVertical: 10 }}>
+                <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => Detail()}>
                     <Text style={{ fontSize: 20, textAlign: 'center', }}>{currentCertificate.certificateName}</Text>
                 </TouchableOpacity>
 
@@ -338,7 +501,7 @@ function Certificate() {
             <View style={styles.buttonBox}>
                 <Text>{selectedFile.name}</Text>
                 <TouchableOpacity style={styles.buttonAdd} onPress={() => handleChooseFile()}>
-                    <Text><Icon name='folder' /> Choose File</Text>
+                    <Text><Icon name='folder' />  {t('Choose file')}</Text>
                 </TouchableOpacity>
                 <Text />
             </View>
@@ -348,12 +511,14 @@ function Certificate() {
 
 //Header---------
 export function CertificateHeader({ navigation }) {
+    const { t, i18n } = useTranslation();
+
     return (
         <View style={styles.homeHeader}>
             <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.openDrawer()} >
                 <Icon name='align-left' size={25} color='white' />
             </TouchableOpacity>
-            <Text style={styles.homeHeaderText}><Icon2 name='pen-nib' size={25} />  Certificates</Text>
+            <Text style={styles.homeHeaderText}><Icon2 name='pen-nib' size={25} />  {t('Certificates')}</Text>
         </View >
     )
 }
@@ -379,11 +544,13 @@ const styles = StyleSheet.create({
         right: 0,
     },
     buttonAdd: {
-        borderWidth: 2,
+        //borderWidth: 2,
         padding: 10,
         paddingHorizontal: 50,
         height: 60,
         justifyContent: 'center',
+        backgroundColor: '#d1d1d1',
+        elevation: 3
     },
     headerText: {
         fontSize: 25,
@@ -396,14 +563,14 @@ const styles = StyleSheet.create({
     //Modal---------
     input: {
         height: 50,
-        width: 150,
+        width: 185,
         borderWidth: 2,
         marginVertical: 10,
     },
     modalContainer: {
         flex: 1,
         //borderWidth: 1,
-        backgroundColor: 'rgba(135, 135, 135, 0.8)',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -412,9 +579,34 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         margin: 50,
         backgroundColor: 'white',
-        width: 300,
-        height: 200,
-        borderRadius: 15,
+        width: Dimensions.get('window').width - 30,
+        height: 220,
+        //borderRadius: 5,
+        elevation: 5,
+        paddingHorizontal: 10
+    },
+    fileName: {
+        paddingBottom: 10,
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+    alertBox: {
+        //alignItems: 'center',
+        //justifyContent: 'center',
+        backgroundColor: 'white',
+        width: Dimensions.get('window').width - 70,
+        height: 180,
+        padding: 30,
+        elevation: 5,
+    },
+    alertText: {
+        fontSize: 19
+    },
+    alertButton: {
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+        flex: 1,
+        paddingRight: 15,
     },
 
     //Header---------
@@ -449,12 +641,20 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginBottom: 15,
         padding: 10,
-        height: 80,
+        //height: 80,
         paddingHorizontal: 15,
         backgroundColor: 'white',
-        elevation: 5,
+        elevation: 3,
         //shadowRadius: 50,
 
+    },
+    detail: {
+        color: 'black',
+        opacity: 0.5,
+        fontSize: 13,
+    },
+    headerDetail: {
+        color: 'black',
     }
 })
 

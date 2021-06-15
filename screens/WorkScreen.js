@@ -4,11 +4,14 @@ import DocumentPicker from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 import Pdf from 'react-native-pdf';
 
 function WorkScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
+
+    const { t, i18n } = useTranslation();
 
     const [file, setFile] = useState({})
     const [loading, setLoading] = useState(false)
@@ -136,7 +139,7 @@ function WorkScreen({ navigation }) {
                     <ShowPdf />
                     <View style={styles.singButtonBox} >
                         <TouchableOpacity style={styles.singButton} onPress={() => handleUploadFile()}>
-                            <Text style={styles.signText}>Sign </Text>
+                            <Text style={styles.signText}>{t('Sign')} </Text>
                             <Icon2 name='file-signature' size={20} />
                         </TouchableOpacity>
                     </View>
@@ -148,12 +151,14 @@ function WorkScreen({ navigation }) {
 
 //Header---------
 export function WorkHeader({ navigation }) {
+    const { t, i18n } = useTranslation();
+
     return (
         <View style={styles.homeHeader}>
             <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.navigate('HomeDrawer')} >
                 <Icon name='home' size={25} color='white' />
             </TouchableOpacity>
-            <Text style={styles.homeHeaderText}>Your Work</Text>
+            <Text style={styles.homeHeaderText}>{t('Your work')}</Text>
             <TouchableOpacity style={styles.headerRight} onPress={() => navigation.navigate('GotoWorkDrawer')} >
                 <Icon name='folder-open' size={25} color='white' />
             </TouchableOpacity>

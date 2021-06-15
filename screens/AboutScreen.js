@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import { useTranslation } from 'react-i18next';
 
 function LoginScreen({ navigation }) {
     return (
@@ -13,12 +14,14 @@ function LoginScreen({ navigation }) {
 
 //Header---------
 export function AboutHeader({ navigation }) {
+    const { t, i18n } = useTranslation();
+
     return (
         <View style={styles.homeHeader}>
             <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.openDrawer()} >
                 <Icon name='align-left' size={25} color='white' />
             </TouchableOpacity>
-            <Text style={styles.homeHeaderText}><Icon name='info-circle' size={30} />  About this App</Text>
+            <Text style={styles.homeHeaderText}><Icon name='info-circle' size={30} />  {t('About this app')}</Text>
         </View >
     )
 }

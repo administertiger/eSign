@@ -9,9 +9,12 @@ import RNFetchBlob from 'rn-fetch-blob'
 import base64 from 'base64-js'
 import { authorize } from 'react-native-app-auth';
 import { Configs } from '../components/configs';
+import { useTranslation } from 'react-i18next';
 
 function DocumentsScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
+
+    const { t, i18n } = useTranslation();
 
     useEffect(() => {
         //handleAuthorize(Configs.adb2c);
@@ -161,7 +164,7 @@ function DocumentsScreen({ navigation }) {
     return (
         <MenuProvider>
             <View style={styles.box}>
-                <Text style={styles.header}>Your Documents</Text>
+                <Text style={styles.header}>{t('Your documents')}</Text>
                 <Text />
                 <FlatList
                     data={documents.slice(0, itemCount)}

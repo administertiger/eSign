@@ -3,6 +3,7 @@ import { View, Button, StyleSheet, Text, Alert, ActivityIndicator } from 'react-
 import { authorize } from 'react-native-app-auth';
 import { Configs } from '../components/configs';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
 
 const initialState = {
     hasLoggedInOnce: false,
@@ -14,6 +15,8 @@ const initialState = {
 
 function LoginScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
+
+    const { t, i18n } = useTranslation();
 
     const [authState, setAuthState] = useState(initialState);
 
@@ -78,13 +81,13 @@ function LoginScreen({ navigation }) {
             {!!authState.accessToken ? (
                 <View>
                     <ActivityIndicator size='large' color='black' />
-                    <Text style={styles.text}>Bringing you to the homepage...</Text>
+                    <Text style={styles.text}>{t('Bringing you to the homepage')}</Text>
                 </View>
             ) : null}
             <View style={{ justifyContent: 'center' }}>
                 {!authState.accessToken ? (
                     <View style={{ marginHorizontal: 40 }}>
-                        <Text style={styles.text}>Who are you???</Text>
+                        <Text style={styles.text}>{t('Who are you')}</Text>
                         <Button title='Login' onPress={() => handleAuthorize(Configs.adb2c)} />
                     </View>
                 ) : null}

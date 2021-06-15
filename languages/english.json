@@ -1,0 +1,32 @@
+{
+    "translation": {
+        "Who are you": "Who are you??",
+        "Bringing you to the homepage": "Bringing you to the homepage...",
+        "Documents": "Documents",
+        "Certificates": "Certificates",
+        "Your recent activity": "Your recent activity",
+        "Home": "Home",
+        "About": "About",
+        "Edit profile": "Edit Profile",
+        "Signout": "Signout",
+        "About this app": "About this app",
+        "Your work": "Your Work",
+        "Sign": "Sign",
+        "Choose file": "Choose File",
+        "New workflow": "NEW WORKFLOW",
+        "Serial number": "Serial Number",
+        "Email": "Email",
+        "Start date": "Start Date",
+        "Expired date": "Expired Date",
+        "Password": "Password",
+        "Please choose only p12 file": "Please choose only p12 file",
+        "Type the password": "Type the password",
+        "Invalid password": "Invalid password",
+        "Submit": "Submit",
+        "Cancel": "Cancel",
+        "Ok": "Ok",
+        "SuccessCertificate": "Success!",
+        "DeleteCertificate": "Delete!!",
+        "Change language": "Language"
+    }
+}

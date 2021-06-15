@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import axios from 'axios';
-
-var fullWidth = Dimensions.get('window').width; //full width
+import { useTranslation } from 'react-i18next';
 
 function HomeScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
+
+    const { t, i18n } = useTranslation();
+
 
     useEffect(() => {
         getList();
@@ -65,11 +67,17 @@ function HomeScreen({ navigation }) {
     }
 
     function renderItem({ item }) {
+
+        const createDateFormat = item.signedTime[8] + item.signedTime[9] + '/' + item.signedTime[5] + item.signedTime[6] + '/' + item.signedTime[0] + item.signedTime[1] + item.signedTime[2] + item.signedTime[3]
+        //console.log(createDateFormat);
+        const createTimeFormat = item.signedTime[11] + item.signedTime[12] + item.signedTime[13] + item.signedTime[14] + item.signedTime[15] + item.signedTime[16] + item.signedTime[17] + item.signedTime[18]
+        console.log(createTimeFormat);
+
         return (
             <TouchableOpacity style={styles.renderBox}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={styles.renderText} numberOfLines={1}>{item.file.displayName}</Text>
-                    <Text>{item.signedTime}</Text>
+                    <Text style={{ paddingLeft: 0 }}>{createDateFormat} {createTimeFormat}</Text>
                 </View>
                 <Text style={{ opacity: 0.5, color: 'black' }}>{item.certificateName}</Text>
             </TouchableOpacity>
@@ -83,27 +91,27 @@ function HomeScreen({ navigation }) {
                 <View style={{ flexDirection: 'row', justifyContent: 'center', paddingTop: 5 }}>
                     <TouchableOpacity style={styles.showCount} onPress={() => navigation.navigate('DocumentsTab')}>
                         <Text style={{ fontSize: 30, color: 'blue', opacity: 0.7 }}>{documents.length}</Text>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Documents</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{t('Documents')}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity style={styles.showCount} onPress={() => navigation.navigate('CertificateDrawer')}>
                         <Text style={{ fontSize: 30, color: 'blue', opacity: 0.7 }}>{certificates.length}</Text>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Certificate</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{t('Certificates')}</Text>
                     </TouchableOpacity>
                 </View>
 
-                <Text style={{ padding: 10, paddingTop: 5, paddingStart: 17, fontSize: 20 }}>Your recent activity</Text>
+                <Text style={{ padding: 10, paddingTop: 5, paddingStart: 17, fontSize: 20 }}>{t('Your recent activity')}</Text>
 
-                <View style={{ justifyContent: 'center', alignItems: 'center', marginHorizontal: 15, backgroundColor: 'white', }}>
 
-                    <FlatList data={documents.slice(0, 5)} renderItem={renderItem} />
 
-                </View>
+                <FlatList data={documents.slice(0, 5)} renderItem={renderItem} />
+
+
                 <View style={styles.workBox}>
                     <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkDrawer') }} >
                         <Text style={{ color: 'black' }}>
-                            <Icon name='plus' /> NEW WORKFLOW
-                            </Text>
+                            <Icon name='plus' /> {t('New workflow')}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -169,19 +177,18 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     renderText: {
-        fontSize: 17,
+        fontSize: 18,
         width: 180
     },
     renderBox: {
         //borderWidth: 1,
         marginVertical: 4,
-        //marginHorizontal: 20,
-        paddingHorizontal: 20,
+        paddingHorizontal: 10,
         paddingVertical: 10,
-        //width: fullWidth,
-        //right: 5,
+        marginHorizontal: 20,
         backgroundColor: 'white',
         elevation: 3,
+        //width: Dimensions.get('window').width - 30,
 
     },
 

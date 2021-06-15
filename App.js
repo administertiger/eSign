@@ -1,7 +1,8 @@
 import React from 'react';
-import { Text, View, StyleSheet, Dimensions } from 'react-native';
+import { Text, View, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, useHeaderHeight } from '@react-navigation/stack';
@@ -46,6 +47,8 @@ function DrawerNavigator() {
 
 //-----------Tabs-----------
 function TabNavigator() {
+    const { t, i18n } = useTranslation();
+
     return (
         <Tab.Navigator tabBarOptions={{
             showLabel: false,
@@ -65,7 +68,7 @@ function TabNavigator() {
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: 'center', }}>
                             <Icon name='home' style={{ color: focused ? `#e32f45` : `#748c94`, }} />
-                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>HOME</Text>
+                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>{t('Home')}</Text>
                         </View>
                     ),
                 }} />
@@ -74,7 +77,7 @@ function TabNavigator() {
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: 'center' }}>
                             <Icon name='folder' style={{ color: focused ? `#e32f45` : `#748c94`, }} />
-                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>DOCUMENTS</Text>
+                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>{t('Documents')}</Text>
                         </View>
                     ),
                     unmountOnBlur: true,
@@ -83,6 +86,8 @@ function TabNavigator() {
     )
 }
 function TabNavigator2() {
+    const { t, i18n } = useTranslation();
+
     return (
         <Tab.Navigator initialRouteName='DocumentsTab' tabBarOptions={{
             showLabel: false,
@@ -102,7 +107,7 @@ function TabNavigator2() {
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: 'center', }}>
                             <Icon name='home' style={{ color: focused ? `#e32f45` : `#748c94`, }} />
-                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>HOME</Text>
+                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>{t('Home')}</Text>
                         </View>
                     ),
                 }} />
@@ -111,7 +116,7 @@ function TabNavigator2() {
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: 'center' }}>
                             <Icon name='folder' style={{ color: focused ? `#e32f45` : `#748c94`, }} />
-                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>DOCUMENTS</Text>
+                            <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>{t('Documents')}</Text>
                         </View>
                     ),
                     unmountOnBlur: true,

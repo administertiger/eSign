@@ -1,0 +1,33 @@
+{
+    "translation": {
+        "Who are you": "ใครอ่ะ?",
+        "Bringing you to the homepage": "กำลังไปสู่หน้าหลัก",
+        "Documents": "เอกสาร",
+        "Certificates": "ใบรับรอง",
+        "Your recent activity": "กิจกรรมล่าสุด",
+        "Your documents": "เอกสารของคุณ",
+        "Home": "หน้าหลัก",
+        "About": "เกี่ยวกับ",
+        "Edit profile": "แก้ไขข้อมูล",
+        "Signout": "ออกจากระบบ",
+        "About this app": "เกี่ยวกับเรา",
+        "Your work": "เอกสาร",
+        "Sign": "ลงลายมือชื่อ",
+        "Choose file": "เลือกไฟล์",
+        "New workflow": "เพิ่มเอกสาร",
+        "Serial number": "หมายเลข",
+        "Email": "อีเมล",
+        "Start date": "วันเริ่มต้น",
+        "Expired date": "วันหมดอายุ",
+        "Password": "รหัสผ่าน",
+        "Please choose only p12 file": "โปรดเลือกเฉพาะไฟล์ p12",
+        "Type the password": "โปรดใส่รหัสผ่าน",
+        "Invalid password": "รหัสผ่านไม่ถูกต้อง",
+        "Submit": "ยืนยัน",
+        "Cancel": "ยกเลิก",
+        "Ok": "ตกลง",
+        "SuccessCertificate": "เพิ่มสำเร็จ!",
+        "DeleteCertificate": "ลบสำเร็จ!",
+        "Change language": "เปลี่ยนถาษา"
+    }
+}
