@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, Dimensions } from 'react-native';
+import { Text, View, Dimensions, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import { useTranslation } from 'react-i18next';
@@ -54,12 +54,12 @@ function TabNavigator() {
             showLabel: false,
             style: {
                 position: 'absolute',
-                marginHorizontal: 10,
+                //marginHorizontal: 10,
                 //bottom: 20,
-                height: 55,
+                height: 60,
                 borderTopStartRadius: 5,
                 borderTopEndRadius: 5,
-                elevation: 3
+                elevation: 1
             },
 
         }}>
@@ -67,16 +67,17 @@ function TabNavigator() {
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: 'center', }}>
-                            <Icon name='home' style={{ color: focused ? `#e32f45` : `#748c94`, }} />
+                            <Icon name='home' size={20} style={{ color: focused ? `#e32f45` : `#748c94`, }} />
                             <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>{t('Home')}</Text>
                         </View>
                     ),
                 }} />
+
             <Tab.Screen name='DocumentsTab' component={DocumentsScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (
                         <View style={{ alignItems: 'center' }}>
-                            <Icon name='folder' style={{ color: focused ? `#e32f45` : `#748c94`, }} />
+                            <Icon name='folder' size={20} style={{ color: focused ? `#e32f45` : `#748c94`, }} />
                             <Text style={{ color: focused ? `#e32f45` : `#748c94`, }}>{t('Documents')}</Text>
                         </View>
                     ),
@@ -111,6 +112,7 @@ function TabNavigator2() {
                         </View>
                     ),
                 }} />
+
             <Tab.Screen name='DocumentsTab' component={DocumentsScreen}
                 options={{
                     tabBarIcon: ({ focused }) => (

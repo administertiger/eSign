@@ -107,7 +107,7 @@ function Certificate() {
             //Handling any exception (If any)
             if (DocumentPicker.isCancel(err)) {
                 //If user canceled the document selection
-                alert('Canceled from single doc picker');
+                //alert('Canceled from single doc picker');
             } else {
                 //For Unknown Error
                 alert('Unknown Error: ' + JSON.stringify(err));
@@ -325,6 +325,7 @@ function Certificate() {
         return (
             <View>
                 <ActivityIndicator size='large' color='black' animating={footerLoading} />
+                <View style={{ marginBottom: 50 }} />
             </View>
         )
     }
@@ -376,25 +377,25 @@ function Certificate() {
                 visible={detailModal}>
                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', }}>
                     <View style={styles.modalBox}>
-                        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 20, textAlign: 'center', paddingBottom: 5 }} >{currentCertificate.certificateName}</Text>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.headerDetail}>{t('Serial number')}: </Text>
-                                <Text style={styles.detail}>{currentCertificate.serialNumber}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.headerDetail}>{t('Email')}: </Text>
-                                <Text style={styles.detail}>{currentCertificate.email}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.headerDetail}>{t('Start date')}: </Text>
-                                <Text style={styles.detail}>{currentCertificateDate.notBefore}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.headerDetail}>{t('Expired date')}: </Text>
-                                <Text style={styles.detail}>{currentCertificateDate.notAfter}</Text>
-                            </View>
+
+                        <Text style={{ fontSize: 20, textAlign: 'center', paddingBottom: 5 }} >{currentCertificate.certificateName}</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.headerDetail}>{t('Serial number')}: </Text>
+                            <Text style={styles.detail}>{currentCertificate.serialNumber}</Text>
                         </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.headerDetail}>{t('Email')}: </Text>
+                            <Text style={styles.detail}>{currentCertificate.email}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.headerDetail}>{t('Start date')}: </Text>
+                            <Text style={styles.detail}>{currentCertificateDate.notBefore}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.headerDetail}>{t('Expired date')}: </Text>
+                            <Text style={styles.detail}>{currentCertificateDate.notAfter}</Text>
+                        </View>
+
                         <View style={{ paddingTop: 10 }}>
                             <Button title='         OK         ' onPress={() => setDetailModal(false)} />
                         </View>
@@ -499,11 +500,10 @@ function Certificate() {
                     onEndReachedThreshold={0} />
             </View>
             <View style={styles.buttonBox}>
-                <Text>{selectedFile.name}</Text>
                 <TouchableOpacity style={styles.buttonAdd} onPress={() => handleChooseFile()}>
-                    <Text><Icon name='folder' />  {t('Choose file')}</Text>
+                    <Text style={{ color: 'white', fontSize: 17 }}><Icon name='folder' size={20} />  {t('Choose file')}</Text>
                 </TouchableOpacity>
-                <Text />
+
             </View>
         </View >
     )
@@ -530,7 +530,7 @@ const styles = StyleSheet.create({
         //paddingTop: 10,
         paddingHorizontal: 20,
         flex: 1,
-        marginBottom: 90,
+        //marginBottom: 90,
     },
     buttonBox: {
         //borderWidth: 1,
@@ -545,12 +545,17 @@ const styles = StyleSheet.create({
     },
     buttonAdd: {
         //borderWidth: 2,
-        padding: 10,
-        paddingHorizontal: 50,
-        height: 60,
+        padding: 20,
+        paddingHorizontal: 30,
+        //height: 60,
         justifyContent: 'center',
-        backgroundColor: '#d1d1d1',
-        elevation: 3
+        backgroundColor: '#e32f45',
+        elevation: 3,
+        borderRadius: 20,
+        position: 'absolute',
+        bottom: 20,
+        //right: 20
+
     },
     headerText: {
         fontSize: 25,
@@ -577,7 +582,7 @@ const styles = StyleSheet.create({
     modalBox: {
         alignItems: 'center',
         justifyContent: 'center',
-        margin: 50,
+        //margin: 50,
         backgroundColor: 'white',
         width: Dimensions.get('window').width - 30,
         height: 220,

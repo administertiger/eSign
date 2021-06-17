@@ -28,6 +28,14 @@
         "Ok": "ตกลง",
         "SuccessCertificate": "เพิ่มสำเร็จ!",
         "DeleteCertificate": "ลบสำเร็จ!",
-        "Change language": "เปลี่ยนถาษา"
+        "Change language": "เปลี่ยนถาษา",
+        "English": "อังกฤษ",
+        "Thai": "ไทย",
+        "Close": "ปิด",
+        "File size": "ขนาดไฟล์",
+        "Create date": "วันที่",
+        "Create time": "เวลา",
+        "Certificated by": "รับรองโดย",
+        "File name": "ชื่อไฟล์"
     }
 }

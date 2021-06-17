@@ -42,6 +42,11 @@ function SideBar({ ...props }) {
         }
     }, [focusedRoute])
 
+    function changeLanguage(language) {
+        i18n.changeLanguage(language)
+        setlanguageModal(false);
+        props.navigation.closeDrawer();
+    }
 
     return (
         <View style={{ flex: 1 }}>
@@ -52,15 +57,15 @@ function SideBar({ ...props }) {
                 <View style={styles.languageContainer}>
                     <View style={styles.languageBox}>
                         <TouchableOpacity style={{ alignItems: 'center', padding: 10 }} onPress={() => setlanguageModal(false)}>
-                            <Text style={{ color: 'blue', }}>Close</Text>
+                            <Text style={{ color: 'black' }}>{t('Close')}</Text>
                         </TouchableOpacity>
                         <ScrollView>
                             <View style={styles.scroll}>
-                                <TouchableOpacity style={styles.language} onPress={() => i18n.changeLanguage('en')}>
-                                    <Text>English</Text>
+                                <TouchableOpacity style={styles.language} onPress={() => changeLanguage('en')}>
+                                    <Text style={styles.languageText}>{t('English')}</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.language} onPress={() => i18n.changeLanguage('th')}>
-                                    <Text>Thai</Text>
+                                <TouchableOpacity style={styles.language} onPress={() => changeLanguage('th')}>
+                                    <Text>{t('Thai')}</Text>
                                 </TouchableOpacity>
                             </View>
                         </ScrollView>
@@ -102,7 +107,7 @@ function SideBar({ ...props }) {
                 <DrawerItem
                     label={t('Change language')}
                     labelStyle={{ color: 'white', }}
-                    icon={() => <Icon2 name='flag-usa' size={21} color='white' />}
+                    icon={() => <Icon2 name='globe' size={21} color='white' />}
                     onPress={() => setlanguageModal(true)} />
             </View>
             <View style={{ backgroundColor: '#616068' }}>
@@ -159,14 +164,15 @@ const styles = StyleSheet.create({
         //backgroundColor: 'white'
     },
     languageBox: {
-        height: 250,
+        height: 200,
         width: Dimensions.get('window').width,
         backgroundColor: '#f0f0f0',
     },
     scroll: {
         paddingHorizontal: 10,
         alignItems: 'center',
-        //backgroundColor: '#e8e8e8'
+        backgroundColor: 'white',
+        height: 200,
     },
     language: {
         margin: 5,
@@ -174,8 +180,12 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width - 40,
         alignItems: 'center',
         backgroundColor: 'white',
-        padding: 10,
-        elevation: 3,
+        padding: 13,
+        //elevation: 3,
+        borderBottomWidth: 0.5,
+    },
+    languageText: {
+        fontSize: 17,
     }
 })
 

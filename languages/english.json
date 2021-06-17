@@ -27,6 +27,14 @@
         "Ok": "Ok",
         "SuccessCertificate": "Success!",
         "DeleteCertificate": "Delete!!",
-        "Change language": "Language"
+        "Change language": "Language",
+        "English": "English",
+        "Thai": "Thai",
+        "Close": "Close",
+        "File size": "File size",
+        "Create date": "Create date",
+        "Create time": "Create time",
+        "Certificated by": "Certificated by",
+        "File name": "File name"
     }
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
+import IconAnt from 'react-native-vector-icons/dist/AntDesign';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -13,10 +14,14 @@ function HomeScreen({ navigation }) {
     useEffect(() => {
         getList();
         getUserProfile();
+        BackHandler.addEventListener('hardwareBackPress', function () {
+            return true;
+        });
     }, []);
 
     const [documents, setDocuments] = useState([]);
     const [certificates, setCertificates] = useState([]);
+    const [isLoading, setIsLoading] = useState(true)
 
     //--------------------Get documents--------------------
     function getList() {
@@ -39,6 +44,7 @@ function HomeScreen({ navigation }) {
                     const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
                     console.log('documents2 = ', merge)
                     setDocuments(merge);
+                    setIsLoading(false);
                 }
 
             }, (error) => {
@@ -104,16 +110,27 @@ function HomeScreen({ navigation }) {
 
 
 
-                <FlatList data={documents.slice(0, 5)} renderItem={renderItem} />
+                <FlatList data={documents.slice(0, 10)} renderItem={renderItem} ListFooterComponent={
+                    <View>
+                        <View style={{ marginBottom: 10, }} />
+                        <ActivityIndicator size='large' color='black' animating={isLoading} />
+                        <View style={{ marginBottom: 45, }} />
+                    </View>
+                } />
 
 
-                <View style={styles.workBox}>
+                {/*<View style={styles.workBox}>
                     <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkDrawer') }} >
                         <Text style={{ color: 'black' }}>
                             <Icon name='plus' /> {t('New workflow')}
                         </Text>
                     </TouchableOpacity>
-                </View>
+                </View>*/}
+                <TouchableOpacity
+                    style={{ position: 'absolute', bottom: 25, right: 30, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', borderRadius: 50, elevation: 5 }}
+                    onPress={() => { navigation.navigate('WorkDrawer') }}>
+                    <IconAnt name='pluscircle' size={65} style={{ color: '#e32f45' }} />
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -137,7 +154,8 @@ const styles = StyleSheet.create({
         flex: 1,
         //justifyContent: 'center',
         //borderWidth: 1,
-        marginBottom: 70,
+        marginBottom: 50,
+        paddingBottom: 5
     },
     button: {
         //borderWidth: 2,
@@ -184,7 +202,7 @@ const styles = StyleSheet.create({
         //borderWidth: 1,
         marginVertical: 4,
         paddingHorizontal: 10,
-        paddingVertical: 10,
+        paddingVertical: 15,
         marginHorizontal: 20,
         backgroundColor: 'white',
         elevation: 3,

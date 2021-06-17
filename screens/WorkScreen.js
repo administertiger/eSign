@@ -37,7 +37,7 @@ function WorkScreen({ navigation }) {
             //Handling any exception (If any)
             if (DocumentPicker.isCancel(err)) {
                 //If user canceled the document selection
-                alert('Canceled from single doc picker');
+                //alert('Canceled from single doc picker');
                 navigation.navigate('HomeDrawer')
             } else {
                 //For Unknown Error
