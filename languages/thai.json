@@ -36,6 +36,8 @@
         "Create date": "วันที่",
         "Create time": "เวลา",
         "Certificated by": "รับรองโดย",
-        "File name": "ชื่อไฟล์"
+        "File name": "ชื่อไฟล์",
+        "Do you want to delete": "คุณต้องการลบ",
+        "Yes or no": "ใช่หรือไม่?"
     }
 }

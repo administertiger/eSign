@@ -164,7 +164,7 @@ function DocumentsScreen({ navigation }) {
         setShowPdf(true);
     }
 
-    function closShowPdf() {
+    function closeShowPdf() {
         setShowPdf(false);
         setFileUri('');
     }
@@ -210,24 +210,24 @@ function DocumentsScreen({ navigation }) {
                 visible={infoModal}>
                 <View style={styles.informationContainer}>
                     <View style={styles.informationBox}>
-                        <Text style={{ fontSize: 20, textAlign: 'center', paddingBottom: 5 }}>{selectedFileInfo.fileName}</Text>
-                        <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ fontSize: 20, textAlign: 'center', paddingVertical: 10 }}>{selectedFileInfo.fileName}</Text>
+                        <View style={styles.detailBox}>
                             <Text style={styles.headerDetail}>{t('File size')}: </Text>
                             <Text style={styles.detail}>{selectedFileInfo.fileSize} kb</Text>
                         </View>
-                        <View style={{ flexDirection: 'row' }}>
+                        <View style={styles.detailBox}>
                             <Text style={styles.headerDetail}>{t('Create date')}: </Text>
                             <Text style={styles.detail}>{selectedFileInfo.createDate}</Text>
                         </View>
-                        <View style={{ flexDirection: 'row' }}>
+                        <View style={styles.detailBox}>
                             <Text style={styles.headerDetail}>{t('Create time')}: </Text>
                             <Text style={styles.detail}>{selectedFileInfo.createTime}</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', width: 300, justifyContent: 'center' }}>
+                        <View style={styles.detailBox}>
                             <Text style={styles.headerDetail}>{t('Certificated by')}: </Text>
                             <Text style={styles.detail}>{selectedFileInfo.certificate}</Text>
                         </View>
-                        <View style={{ paddingTop: 10 }}>
+                        <View style={{ paddingVertical: 10 }}>
                             <Button title='         OK         ' onPress={() => setInfoModal(false)} />
                         </View>
                     </View>
@@ -239,7 +239,7 @@ function DocumentsScreen({ navigation }) {
                 transparent={false}
                 visible={showPdf}>
                 <View style={{ flex: 1 }}>
-                    <Button title='Close' onPress={() => closShowPdf()} />
+                    <Button title='Close' onPress={() => closeShowPdf()} />
                     <ShowPdf />
                 </View>
             </Modal>
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     },
     informationBox: {
         width: Dimensions.get('window').width - 30,
-        height: 220,
+        height: 250,
         //borderWidth: 1,
         backgroundColor: 'white',
         elevation: 3,
@@ -313,10 +313,23 @@ const styles = StyleSheet.create({
     detail: {
         color: 'black',
         opacity: 0.5,
-        fontSize: 13,
+        fontSize: 15,
         //width: Dimensions.get('window').width - 30,
-        textAlign: 'center'
+        textAlign: 'center',
+        //borderWidth: 1,
 
+    },
+    detailBox: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        //borderWidth: 1,
+        paddingHorizontal: 5
+    },
+    headerDetail: {
+        color: 'black',
+        fontSize: 16,
+        //padding: 5
     },
 })
 

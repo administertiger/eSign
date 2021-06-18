@@ -18,8 +18,9 @@ function Certificate() {
     const [certificate, setCertificate] = useState([]);
     const [text, onChangeText] = useState('');
     const [selectedFile, setSelectedFile] = useState({});
-    const [currentCertificate, setCerrentCertificate] = useState({})
-    const [currentCertificateDate, setCurrentCertificateDate] = useState({})
+    const [currentCertificate, setCerrentCertificate] = useState({});
+    const [currentCertificateDate, setCurrentCertificateDate] = useState({});
+    const [selectedCertificate, setSelectedCertificate] = useState({})
 
     //Modal
     const [uploadModalLoading, setUploadModalLoading] = useState(false);
@@ -30,6 +31,7 @@ function Certificate() {
     const [invalidPasswordlModal, setInvalidPasswordModal] = useState(false);
     const [successModal, setSuccessModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
+    const [beforeDeleteModal, setBeforeDeleteModal] = useState(false)
 
 
     useState(() => {
@@ -143,6 +145,7 @@ function Certificate() {
             setUploadModalLoading(false);
             //Alert.alert('Upload success!')
             setSuccessModal(true);
+            setSelectedCertificate({})
         }, (error) => {
             console.log(error);
             console.log('Upload Fail T_T')
@@ -211,9 +214,15 @@ function Certificate() {
     }
 
     //---------------------------Delete certificate---------------------------
+    function DeleteModal(item) {
+        setBeforeDeleteModal(true);
+        setSelectedCertificate(item);
+        console.log('selected =', selectedCertificate)
+    }
 
     function DeleteCertificate(id) {
-        setUploadModalLoading(true);
+        setBeforeDeleteModal(false)
+        setUploadModalLoading(true)
         axios({
             method: 'DELETE',
             url: API_URL + '/accounts/certificates/' + id,
@@ -229,6 +238,11 @@ function Certificate() {
             console.log(error);
             console.log('Upload Fail T_T')
         })
+    }
+
+    function cancelDeleteModal() {
+        setBeforeDeleteModal(false);
+        setSelectedCertificate({});
     }
 
     //------------------------------Change Certification--------------------------
@@ -272,40 +286,42 @@ function Certificate() {
         }
 
         return (
-            <View>
-                <View style={styles.renderBox}>
-                    <View>
-                        <Text numberOfLines={1} style={{ width: 230, fontSize: 20, }} >{item.certificateName}</Text>
-                        <View style={{ paddingLeft: 5 }}>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.headerDetail}>{t('Serial number')}: </Text>
-                                <Text style={styles.detail}>{item.serialNumber}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.headerDetail}>{t('Email')}: </Text>
-                                <Text style={styles.detail}>{item.email}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.headerDetail}>{t('Start date')}: </Text>
-                                <Text style={styles.detail}>{createDateFormat} {createTimeFormat}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={styles.headerDetail}>{t('Expired date')}: </Text>
-                                <Text style={styles.detail}>{expireDateFormat} {expireTimeFormat}</Text>
-                            </View>
+
+            <View style={styles.renderBox}>
+
+                <View >
+                    <Text numberOfLines={1} style={{ width: 230, fontSize: 20, }} >{item.certificateName}</Text>
+                    <View style={{ paddingLeft: 5, }}>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.headerDetail}>{t('Serial number')}: </Text>
+                            <Text style={styles.detail}>{item.serialNumber}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.headerDetail}>{t('Email')}: </Text>
+                            <Text style={styles.detail}>{item.email}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.headerDetail}>{t('Start date')}: </Text>
+                            <Text style={styles.detail}>{createDateFormat} {createTimeFormat}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={styles.headerDetail}>{t('Expired date')}: </Text>
+                            <Text style={styles.detail}>{expireDateFormat} {expireTimeFormat}</Text>
                         </View>
                     </View>
-                    <View style={{ flexDirection: 'row' }}>
-                        <TouchableOpacity onPress={() => changeCertification(item.id)} >
-                            <Icon name='check-circle' size={40} />
-                        </TouchableOpacity>
-                        <Text>  </Text>
-                        <TouchableOpacity onPress={() => DeleteCertificate(item.id)} >
-                            <Icon name='times-circle' size={40} />
-                        </TouchableOpacity>
-                    </View>
-                </View >
+                </View>
+                <View style={{ flexDirection: 'row' }}>
+                    <TouchableOpacity onPress={() => changeCertification(item.id)} >
+                        <Icon name='check-circle' size={40} />
+                    </TouchableOpacity>
+                    <Text>  </Text>
+                    <TouchableOpacity onPress={() => DeleteModal(item)} >
+                        <Icon name='times-circle' size={40} />
+                    </TouchableOpacity>
+                </View>
+
             </View >
+
         )
     }
 
@@ -347,7 +363,7 @@ function Certificate() {
                     </View>
                 </View>
             </Modal>
-            {/* passwordModalState */}
+            {/* passwordModal */}
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -356,16 +372,21 @@ function Certificate() {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalBox}>
                         <Text style={styles.fileName}>{selectedFile.name}</Text>
-                        <Text>{t('Password')}</Text>
+                        <Text style={{ fontSize: 16 }}>{t('Password')}</Text>
                         <TextInput
                             style={styles.input}
                             onChangeText={onChangeText}
                             value={text}
                         />
                         <View style={{ flexDirection: 'row', paddingTop: 5 }}>
-                            <Button title={t('Submit')} onPress={() => handleSubmit()} />
-                            <Text>  </Text>
-                            <Button title={t('Cancel')} onPress={() => CancleModal()} />
+                            <TouchableOpacity onPress={() => handleSubmit()}>
+                                <Text style={styles.modalSubmitButton}>{t('Submit')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => CancleModal()}>
+                                <Text style={styles.modalCancelButton}>{t('Cancel')}</Text>
+                            </TouchableOpacity>
+
+
                         </View>
                     </View>
                 </View>
@@ -402,7 +423,7 @@ function Certificate() {
                     </View>
                 </View>
             </Modal>
-            {/* p12lModal */}
+            {/* pleaseSelecteP12lModal */}
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -410,11 +431,9 @@ function Certificate() {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <View style={styles.alertBox}>
                         <Text style={styles.alertText}>{t('Please choose only p12 file')}</Text>
-                        <View style={styles.alertButton}>
-                            <TouchableOpacity onPress={() => setP12Modal(false)}>
-                                <Text style={styles.alertText}>{t('Ok')}</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity style={styles.alertButton} onPress={() => setP12Modal(false)}>
+                            <Text style={styles.alertButtonText}>{t('Ok')}</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -426,11 +445,9 @@ function Certificate() {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <View style={styles.alertBox}>
                         <Text style={styles.alertText}>{t('Type the password')}</Text>
-                        <View style={styles.alertButton}>
-                            <TouchableOpacity onPress={() => setEmptyPasswordModal(false)}>
-                                <Text style={styles.alertText}>{t('Ok')}</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity style={styles.alertButton} onPress={() => setEmptyPasswordModal(false)}>
+                            <Text style={styles.alertButtonText}>{t('Ok')}</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -442,11 +459,9 @@ function Certificate() {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <View style={styles.alertBox}>
                         <Text style={styles.alertText}>{t('Invalid password')}</Text>
-                        <View style={styles.alertButton}>
-                            <TouchableOpacity onPress={() => setInvalidPasswordModal(false)}>
-                                <Text style={styles.alertText}>{t('Ok')}</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity style={styles.alertButton} onPress={() => setInvalidPasswordModal(false)}>
+                            <Text style={styles.alertButtonText}>{t('Ok')}</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -458,11 +473,9 @@ function Certificate() {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <View style={styles.alertBox}>
                         <Text style={styles.alertText}>{t('SuccessCertificate')}</Text>
-                        <View style={styles.alertButton}>
-                            <TouchableOpacity onPress={() => setSuccessModal(false)}>
-                                <Text style={styles.alertText}>{t('Ok')}</Text>
-                            </TouchableOpacity>
-                        </View>
+                        <TouchableOpacity style={styles.alertButton} onPress={() => setSuccessModal(false)}>
+                            <Text style={styles.alertButtonSuccess}>{t('Ok')}</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
@@ -474,9 +487,28 @@ function Certificate() {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <View style={styles.alertBox}>
                         <Text style={styles.alertText}>{t('DeleteCertificate')}</Text>
+                        <TouchableOpacity style={styles.alertButton} onPress={() => setDeleteModal(false)}>
+                            <Text style={styles.alertButtonSuccess}>{t('Ok')}</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+            {/* BeforeDeleteModal */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={beforeDeleteModal}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Do you want to delete')} ? </Text>
+                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>"{selectedCertificate.certificateName}" </Text>
+
                         <View style={styles.alertButton}>
-                            <TouchableOpacity onPress={() => setDeleteModal(false)}>
-                                <Text style={styles.alertText}>{t('Ok')}</Text>
+                            <TouchableOpacity style={{ paddingRight: 20 }} onPress={() => DeleteCertificate(selectedCertificate.id)}>
+                                <Text style={styles.alertButtonSuccess}>{t('Ok')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => cancelDeleteModal()}>
+                                <Text style={styles.alertButtonText}>{t('Cancel')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -487,7 +519,7 @@ function Certificate() {
                 <View style={{ borderTopWidth: 1, marginTop: 10, marginHorizontal: 15, }} />
 
                 <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => Detail()}>
-                    <Text style={{ fontSize: 20, textAlign: 'center', }}>{currentCertificate.certificateName}</Text>
+                    <Text style={styles.currentCertificate}>{currentCertificate.certificateName}</Text>
                 </TouchableOpacity>
 
                 <View style={{ borderTopWidth: 1, marginBottom: 10, marginHorizontal: 15, }} />
@@ -557,27 +589,28 @@ const styles = StyleSheet.create({
         //right: 20
 
     },
-    headerText: {
-        fontSize: 25,
-        fontWeight: 'bold',
-        //paddingVertical: 20,
-        //paddingLeft: 20,
-        textAlign: 'center'
+    currentCertificate: {
+        fontSize: 20,
+        textAlign: 'center',
     },
 
     //Modal---------
     input: {
-        height: 50,
+        height: 40,
         width: 185,
-        borderWidth: 2,
+        //borderWidth: 1,
         marginVertical: 10,
+        //borderRadius: 20,
+        elevation: 3,
+        backgroundColor: '#e8e8e8'
     },
     modalContainer: {
         flex: 1,
         //borderWidth: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        //borderRadius: 10,
     },
     modalBox: {
         alignItems: 'center',
@@ -592,7 +625,7 @@ const styles = StyleSheet.create({
     },
     fileName: {
         paddingBottom: 10,
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold'
     },
     alertBox: {
@@ -600,18 +633,39 @@ const styles = StyleSheet.create({
         //justifyContent: 'center',
         backgroundColor: 'white',
         width: Dimensions.get('window').width - 70,
-        height: 180,
+        height: 200,
         padding: 30,
         elevation: 5,
     },
     alertText: {
-        fontSize: 19
+        fontSize: 19,
+
+    },
+    alertButtonText: {
+        fontSize: 19,
+        color: '#d44253',
+    },
+    alertButtonSuccess: {
+        fontSize: 19,
+        color: 'black',
     },
     alertButton: {
         alignItems: 'flex-end',
         justifyContent: 'flex-end',
         flex: 1,
         paddingRight: 15,
+        flexDirection: 'row',
+
+    },
+    modalSubmitButton: {
+        fontSize: 19,
+        paddingHorizontal: 20,
+        color: 'black',
+    },
+    modalCancelButton: {
+        fontSize: 19,
+        paddingHorizontal: 20,
+        color: '#d44253',
     },
 
     //Header---------
@@ -642,15 +696,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        elevation: 5,
         //borderWidth: 1,
-        borderRadius: 10,
+        borderRadius: 0,
         marginBottom: 15,
         padding: 10,
         //height: 80,
         paddingHorizontal: 15,
         backgroundColor: 'white',
-        elevation: 3,
-        //shadowRadius: 50,
 
     },
     detail: {
