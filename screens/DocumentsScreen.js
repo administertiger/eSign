@@ -2,13 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, Modal, Dimensions, Button } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Menu, MenuOptions, MenuOption, MenuTrigger, MenuProvider } from 'react-native-popup-menu';
+import IconFeather from 'react-native-vector-icons/dist/Feather';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Pdf from 'react-native-pdf';
-import RNFetchBlob from 'rn-fetch-blob'
-import base64 from 'base64-js'
-import { authorize } from 'react-native-app-auth';
-import { Configs } from '../components/configs';
+import RNFetchBlob from 'rn-fetch-blob';
 import { useTranslation } from 'react-i18next';
 
 function DocumentsScreen({ navigation }) {
@@ -26,10 +23,12 @@ function DocumentsScreen({ navigation }) {
     const [documents, setDocuments] = useState([]);
     const [itemCount, setItemCount] = useState(9);
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedFileInfo, setSelectedFileInfo] = useState({})
+    const [selectedFileInfo, setSelectedFileInfo] = useState({});
+    const [fileUri, setFileUri] = useState('')
 
     //Modal
     const [infoModal, setInfoModal] = useState(false);
+    const [showPdf, setShowPdf] = useState(false)
 
     function getList() {
 
@@ -124,6 +123,52 @@ function DocumentsScreen({ navigation }) {
         setInfoModal(true);
     }
 
+    //----------------------------Show PDF-----------------------------
+
+    const ShowPdf = () => {
+
+        const source = { uri: "data:application/pdf;base64," + fileUri };
+
+        return (
+            <Pdf
+                source={source}
+                onLoadComplete={(numberOfPages, filePath) => {
+                    console.log(`number of pages: ${numberOfPages}`);
+                    //setTotalPage(numberOfPages);
+                }}
+                onPageChanged={(page, numberOfPages) => {
+                    console.log(`current page: ${page}`);
+                    //setCurrentPage(page);  //set the cuurentPage
+                }}
+                onError={(error) => {
+                    console.log(error);
+                }}
+                onPressLink={(uri) => {
+                    console.log(`Link presse: ${uri}`)
+                }}
+                style={styles.pdf} />
+        )
+    }
+
+    function getBlob(item) {
+        RNFetchBlob.fetch('GET', "https://ws.esigns.cloud/files/" + item.id, { 'Authorization': 'Bearer ' + global.token, })
+            .then((res) => {
+                console.log("Success = ", res);
+                setFileUri(res.data);
+            })
+            .catch((err) => { console.log('error', err) }) // To execute when download cancelled and other errors
+    }
+
+    function handleShowPdf(item) {
+        getBlob(item);
+        setShowPdf(true);
+    }
+
+    function closShowPdf() {
+        setShowPdf(false);
+        setFileUri('');
+    }
+
     //----------------------Render Items---------------------------
 
     function RenderItem({ item }) {
@@ -143,12 +188,12 @@ function DocumentsScreen({ navigation }) {
                 </TouchableOpacity>
                 <View style={{ position: 'absolute', right: 30, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
 
-                    <TouchableOpacity>
-                        <Icon name='search' color='black' size={25} />
+                    <TouchableOpacity onPress={() => handleShowPdf(item)}>
+                        <IconFeather name='search' color='black' size={25} />
                     </TouchableOpacity>
                     <Text>       </Text>
                     <TouchableOpacity onPress={() => handleDownload(item)}>
-                        <Icon name='download' color='black' size={25} />
+                        <IconFeather name='download' color='black' size={25} />
                     </TouchableOpacity>
                 </View>
             </View >
@@ -158,6 +203,7 @@ function DocumentsScreen({ navigation }) {
 
     return (
         <View style={styles.box}>
+            {/* Detail modal */}
             <Modal
                 animationType='fade'
                 transparent={true}
@@ -185,6 +231,16 @@ function DocumentsScreen({ navigation }) {
                             <Button title='         OK         ' onPress={() => setInfoModal(false)} />
                         </View>
                     </View>
+                </View>
+            </Modal>
+            {/* Show pdf modal */}
+            <Modal
+                animationType='slide'
+                transparent={false}
+                visible={showPdf}>
+                <View style={{ flex: 1 }}>
+                    <Button title='Close' onPress={() => closShowPdf()} />
+                    <ShowPdf />
                 </View>
             </Modal>
             <Text style={styles.header}>{t('Your documents')}</Text>
@@ -231,6 +287,11 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         fontSize: 25,
         //fontWeight: 'bold',
+    },
+    pdf: {
+        flex: 1,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
     },
     //------------Modal-------------
     informationContainer: {

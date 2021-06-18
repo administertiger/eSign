@@ -114,22 +114,13 @@ function HomeScreen({ navigation }) {
                     <View>
                         <View style={{ marginBottom: 10, }} />
                         <ActivityIndicator size='large' color='black' animating={isLoading} />
-                        <View style={{ marginBottom: 45, }} />
+                        <View style={{ marginBottom: 15, }} />
                     </View>
                 } />
-
-
-                {/*<View style={styles.workBox}>
-                    <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('WorkDrawer') }} >
-                        <Text style={{ color: 'black' }}>
-                            <Icon name='plus' /> {t('New workflow')}
-                        </Text>
-                    </TouchableOpacity>
-                </View>*/}
                 <TouchableOpacity
-                    style={{ position: 'absolute', bottom: 25, right: 30, justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', borderRadius: 50, elevation: 5 }}
+                    style={styles.button}
                     onPress={() => { navigation.navigate('WorkDrawer') }}>
-                    <IconAnt name='pluscircle' size={65} style={{ color: '#e32f45' }} />
+                    <IconAnt name='pluscircle' size={65} style={{ color: '#54c489' }} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -158,16 +149,14 @@ const styles = StyleSheet.create({
         paddingBottom: 5
     },
     button: {
-        //borderWidth: 2,
-        alignItems: 'center',
+        position: 'absolute',
+        bottom: 25,
+        right: 30,
         justifyContent: 'center',
-        marginHorizontal: 30,
-        marginBottom: 10,
-        height: 60,
-        //borderRadius: 10,
-        //borderStyle: 'dashed',
-        backgroundColor: '#d1d1d1',
-        elevation: 5,
+        alignItems: 'center',
+        backgroundColor: 'white',
+        borderRadius: 50,
+        elevation: 5
     },
     workBox: {
         //borderWidth: 1,
