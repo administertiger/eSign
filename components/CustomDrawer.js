@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
-import { View, Text, StyleSheet, Dimensions, Modal, Button, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Modal, Button, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import { authorize } from 'react-native-app-auth';
+import { Configs } from '../components/configs';
 
 function SideBar({ ...props }) {
 
+    const API_URL = 'https://ws.esigns.cloud';
     const { t, i18n } = useTranslation();
 
     //Get the cuurent route.
@@ -45,9 +49,87 @@ function SideBar({ ...props }) {
     function changeLanguage(language) {
         i18n.changeLanguage(language)
         setlanguageModal(false);
+        patchLanguage(language)
         props.navigation.closeDrawer();
     }
 
+    //--------------------Get current certification.------------------
+    function patchLanguage(language) {
+        axios({
+            method: 'PATCH',
+            url: API_URL + '/accounts',
+            headers: {
+                'Authorization': 'Bearer ' + global.token,
+                "content-type": "application/json",
+            },
+            data: {
+                "replace": "/settings/language",
+                "value": language
+            }
+        }).then((response) => {
+            console.log(response);
+            if (response.data) {
+
+            }
+            //console.log(certificate);
+
+        }, (error) => {
+            console.log(error);
+        })
+    }
+    //-------------------------Get login--------------------------
+    const handleAuthorize = useCallback(
+        async provider => {
+            try {
+                //const config = Configs[provider];
+                const config = provider
+                const newAuthState = await authorize(config);
+
+                //setAuthState({
+                //    hasLoggedInOnce: false,
+                //    provider: provider,
+                //    ...newAuthState
+                //});
+
+                getUserProfile(newAuthState.accessToken)
+                global.token = newAuthState.accessToken; //Get accessToken
+                console.log('User token: ', newAuthState);
+
+            } catch (error) {
+                Alert.alert('Failed to log in', error.message);
+            }
+        }
+    );
+
+    //----------------------User profile-------------------------
+    function getUserProfile(token) {
+        axios.get(API_URL + '/accounts',  //Account API
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then((response) => {
+                console.log(response);
+                if (response.data) {
+                    i18n.changeLanguage(response.data.settings.language)
+
+                    //Set Global profile
+                    global.country = response.data.profiles.country;
+                    global.email = response.data.profiles.email;
+                    global.firstName = 'Kuy';
+                    global.lastName = response.data.profiles.lastName;
+                    global.name = response.data.profiles.name
+
+                    console.log('Profile set!!', global.firstName);
+                    props.navigation.closeDrawer();
+                }
+
+            }, (error) => {
+                console.log(error);
+
+            })
+    }
     return (
         <View style={{ flex: 1 }}>
             <Modal
@@ -121,7 +203,8 @@ function SideBar({ ...props }) {
                 <DrawerItem
                     label={t('Signout')}
                     labelStyle={{ color: 'white', }}
-                    icon={() => <Icon2 name='sign-out-alt' size={23} color='white' />} />
+                    icon={() => <Icon2 name='sign-out-alt' size={23} color='white' />}
+                    onPress={() => { handleAuthorize(Configs.logout) }} />
             </View>
 
         </View>

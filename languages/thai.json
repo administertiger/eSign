@@ -38,6 +38,18 @@
         "Certificated by": "รับรองโดย",
         "File name": "ชื่อไฟล์",
         "Do you want to delete": "คุณต้องการลบ",
-        "Yes or no": "ใช่หรือไม่?"
+        "Yes or no": "ใช่หรือไม่?",
+        "Digital sign success": "ลงลายมือชื่อสำเร็จ!",
+        "Go to document": "ไปยังเอกสาร",
+        "New file": "ไฟล์ใหม่",
+        "eSings app is an electronic signature mobile app that help you sign electronic documents both electronic sign with your signature picture file or digital sign by your certificate from certificate authority (CA).": "eSigns เป็นแอปพลิเคชันที่ช่วยให้ท่านสามารถลงลายมือชื่ออิเล็กทรอนิกส์ (มาตรา 9) และลายมือชื่ออิเล็กทรอนิกส์แบบเชื่อถือได้ (มาตรา 26) และสามารถใช้ใบรับรองอิเล็กทรอนิกส์ (มาตรา 28) แห่งพระราชบัญญัติว่าด้วยธุรกรรมทางอิเล็กทรอนิกส์ พ.ศ. 2544 และที่ได้แก้ไขเพิ่มเติม ในการลงลายเซ็นดิจิทัลบนเอกสารอิเล็กทรอนิกส์",
+        "This mobile application can help you sign electronic documents anywhere anytime with fast and easy.": "ท่านสามารถใช้ eSigns ในการลงลายมือชื่ออิเล็กทรอนิกส์ ได้ทุกที ทุกเวลา จากมือถือของท่าน ช่วยให้ท่านทำงานได้อย่าง สะดวก รวดเร็ว",
+        "Digital Signature": "ลายมือชื่ออิเล็กทรอนิกส์แบบเชื่อถือได้ (มาตรา 26)",
+        "Support PDF file.": "รองรับไฟล์ PDF",
+        "PAdES (PDF Advanced Electronic Signatures)": "รองรับการลงลายเซ็นแบบเชื่อถือได้ PAdES (PDF Advanced Electronic Signatures)",
+        "Support XML file. ": "รองรับไฟล์ XML",
+        "XAdES (XML Advanced Electronic Signatures)": "รองรับการลงลายเซ็นแบบเชื่อถือได้ XAdES (XML Advanced Electronic Signatures)",
+        "Use your own .p12 or .pfx certificate file for digital sign.": "รองรับใบรับรองอิเล็กทรอนิกส์จากผู้ออกใบรับรองอิเล็กทรอนิกส์ตาม มาตรา 28 สำหรับการลงลายเซ็นดิจิทัล",
+        "Logging in": "กำลังเข้าสู่ระบบ..."
     }
 }

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { View, Button, StyleSheet, Text, Alert, ActivityIndicator } from 'react-native';
 import { authorize } from 'react-native-app-auth';
 import { Configs } from '../components/configs';
+import Icon from 'react-native-vector-icons/dist/FontAwesome5'
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
@@ -20,6 +21,10 @@ function LoginScreen({ navigation }) {
 
     const [authState, setAuthState] = useState(initialState);
 
+    useEffect(() => {
+        handleAuthorize(Configs.login)
+    }, [])
+
     //----------------------User profile-------------------------
     function getUserProfile(token) {
         axios.get(API_URL + '/accounts',  //Account API
@@ -31,6 +36,8 @@ function LoginScreen({ navigation }) {
             .then((response) => {
                 console.log(response);
                 if (response.data) {
+                    i18n.changeLanguage(response.data.settings.language)
+
                     //Set Global profile
                     global.country = response.data.profiles.country;
                     global.email = response.data.profiles.email;
@@ -87,8 +94,7 @@ function LoginScreen({ navigation }) {
             <View style={{ justifyContent: 'center' }}>
                 {!authState.accessToken ? (
                     <View style={{ marginHorizontal: 40 }}>
-                        <Text style={styles.text}>{t('Who are you')}</Text>
-                        <Button title='Login' onPress={() => handleAuthorize(Configs.adb2c)} />
+                        <Text style={styles.text}>{t('Logging in')}</Text>
                     </View>
                 ) : null}
             </View>

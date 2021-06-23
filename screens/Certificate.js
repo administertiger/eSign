@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, BackHandler, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon2 from 'react-native-vector-icons/dist/FontAwesome5';
 import DocumentPicker from 'react-native-document-picker';
@@ -10,7 +10,22 @@ import { useTranslation } from 'react-i18next';
 
 const forge = require('node-forge');
 
-function Certificate() {
+function Certificate({ navigation }) {
+
+    useEffect(() => {
+        const backAction = () => {
+            navigation.navigate('HomeDrawer');
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
+
     const API_URL = 'https://ws.esigns.cloud';
 
     const { t, i18n } = useTranslation();
@@ -58,6 +73,7 @@ function Certificate() {
                     console.log('certificate = ', response.data.certificates)
                     setCertificate(response.data.certificates)
                     setUploadModalLoading(false);
+                    setFooterLoading(false);
 
                     const testCer = response.data.certificates
                     const obj = testCer.find(item => item.id === response.data.settings.defaultCertificateId)
@@ -290,8 +306,8 @@ function Certificate() {
             <View style={styles.renderBox}>
 
                 <View >
-                    <Text numberOfLines={1} style={{ width: 230, fontSize: 20, }} >{item.certificateName}</Text>
-                    <View style={{ paddingLeft: 5, }}>
+                    <Text numberOfLines={1} style={{ fontSize: 20, marginRight: 0, paddingRight: 50 }} >{item.certificateName}</Text>
+                    <View style={{ paddingLeft: 5, marginRight: 0, }}>
                         <View style={{ flexDirection: 'row' }}>
                             <Text style={styles.headerDetail}>{t('Serial number')}: </Text>
                             <Text style={styles.detail}>{item.serialNumber}</Text>
@@ -310,7 +326,7 @@ function Certificate() {
                         </View>
                     </View>
                 </View>
-                <View style={{ flexDirection: 'row' }}>
+                <View style={{ flexDirection: 'row', position: 'absolute', right: 10 }}>
                     <TouchableOpacity onPress={() => changeCertification(item.id)} >
                         <Icon name='check-circle' size={40} />
                     </TouchableOpacity>
@@ -621,11 +637,11 @@ const styles = StyleSheet.create({
         height: 220,
         //borderRadius: 5,
         elevation: 5,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
     },
     fileName: {
-        paddingBottom: 10,
-        fontSize: 20,
+        paddingBottom: 20,
+        fontSize: 22,
         fontWeight: 'bold'
     },
     alertBox: {
@@ -634,7 +650,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         width: Dimensions.get('window').width - 70,
         height: 200,
-        padding: 30,
+        padding: 25,
         elevation: 5,
     },
     alertText: {

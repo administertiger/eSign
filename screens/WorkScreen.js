@@ -13,14 +13,20 @@ function WorkScreen({ navigation }) {
 
     const { t, i18n } = useTranslation();
 
-    const [file, setFile] = useState({})
-    const [loading, setLoading] = useState(false)
+    const [file, setFile] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [successModal, setSuccessModal] = useState(false);
 
     //------------------------handle choos file--------------------------
 
     useEffect(() => {
         handleChooseFile();
+
     }, [])
+    //useEffect(() => {
+    //    console.log('file = ', file)
+    //
+    //}, [file])
 
     const handleChooseFile = async () => {
         //Opening Document Picker for selection of one file
@@ -31,7 +37,7 @@ function WorkScreen({ navigation }) {
 
             console.log('res = ', res)
             //Setting the state to show single file attributes
-            setFile({ name: res.name, uri: res.uri, type: res.type, size: res.size });
+            setFile(res);
 
         } catch (err) {
             //Handling any exception (If any)
@@ -81,8 +87,10 @@ function WorkScreen({ navigation }) {
         let formData = new FormData();
         formData.append('file', file);
 
+        console.log('formData = ', formData)
+
         axios({
-            method: 'post',
+            method: 'POST',
             url: API_URL + '/documents/pdf/digitalsign',
             data: formData._parts.length > 0 ? formData : null,
             headers: {
@@ -91,7 +99,7 @@ function WorkScreen({ navigation }) {
             },
         })
             .then((response) => {
-                console.log('response = ', response);
+                console.log('responsePost = ', response);
                 console.log('Done? = ', 'DONE!!');
 
                 //Get status of the file.
@@ -105,9 +113,9 @@ function WorkScreen({ navigation }) {
                         if (response.data.status === 'complete') {
                             clearInterval(myInterval);
                             console.log('Complete!')
-                            Alert.alert('complete')
+                            setSuccessModal(true);
                             setLoading(false);
-                            navigation.navigate('DocumentsDrawer')
+                            //navigation.navigate('DocumentsDrawer')
                         } else if (response.data.status === 'fail') {
                             clearInterval(myInterval);
                             console.log('Fail T_T')
@@ -128,6 +136,7 @@ function WorkScreen({ navigation }) {
         <View style={styles.container} >
             {file.uri ? (
                 <View >
+                    {/* Loading modal */}
                     <Modal
                         animationType="fade"
                         transparent={true}
@@ -136,11 +145,30 @@ function WorkScreen({ navigation }) {
                             <ActivityIndicator size='large' color='white' animating={true} />
                         </View>
                     </Modal>
+                    {/* Complete modal */}
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={successModal}>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                            <View style={styles.alertBox}>
+                                <Text style={styles.alertText}>{t('Digital sign success')}</Text>
+                                <View style={styles.alertButton}>
+                                    <TouchableOpacity style={{ paddingRight: 20 }} onPress={() => navigation.navigate('GotoWorkDrawer')}>
+                                        <Text style={{ fontSize: 17, color: '#54c489', }}><Icon name='plus' size={15} /> {t('New file')}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => navigation.navigate('DocumentsDrawer')}>
+                                        <Text style={{ fontSize: 17, color: '#595959', }}><Icon name='folder' size={15} /> {t('Go to document')}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
                     <ShowPdf />
                     <View style={styles.singButtonBox} >
                         <TouchableOpacity style={styles.singButton} onPress={() => handleUploadFile()}>
                             <Text style={styles.signText}>{t('Sign')} </Text>
-                            <Icon2 name='file-signature' size={20} />
+                            <Icon2 name='pen' size={20} style={{ color: 'white' }} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -194,13 +222,13 @@ const styles = StyleSheet.create({
         height: 50,
         width: 250,
         borderRadius: 10,
-        backgroundColor: '#d1d1d1',
+        backgroundColor: '#54c489',
         elevation: 3,
     },
     signText: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: 'rgba(46, 46, 46, 1)'
+        color: 'white'
     },
     singButtonBox: {
         position: 'absolute',
@@ -233,6 +261,28 @@ const styles = StyleSheet.create({
     homeHeaderText: {
         fontSize: 23,
         color: 'white'
+    },
+    //-------Modal---------------
+    alertBox: {
+        //alignItems: 'center',
+        //justifyContent: 'center',
+        backgroundColor: 'white',
+        width: Dimensions.get('window').width - 70,
+        height: 200,
+        padding: 25,
+        elevation: 5,
+    },
+    alertText: {
+        fontSize: 22,
+
+    },
+    alertButton: {
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+        flex: 1,
+        paddingRight: 15,
+        flexDirection: 'row',
+
     },
 });
 

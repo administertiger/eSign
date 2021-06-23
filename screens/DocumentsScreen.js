@@ -178,15 +178,10 @@ function DocumentsScreen({ navigation }) {
                 <TouchableOpacity style={styles.listBox} onPress={() => toggleModal(item)}>
                     <View>
                         <Text numberOfLines={1} style={styles.listText}>{item.file.displayName}</Text>
-                        <Text style={{ width: 200, color: 'rgba(0, 0, 0, 0.5)' }}>{item.certificateName}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-
-                        <Text>   </Text>
-
+                        <Text style={{ color: 'rgba(0, 0, 0, 0.5)' }}>{item.certificateName}</Text>
                     </View>
                 </TouchableOpacity>
-                <View style={{ position: 'absolute', right: 30, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }}>
+                <View style={{ position: 'absolute', right: 30, top: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', }}>
 
                     <TouchableOpacity onPress={() => handleShowPdf(item)}>
                         <IconFeather name='search' color='black' size={25} />
@@ -275,9 +270,10 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width - 40,
         backgroundColor: 'white',
         elevation: 3,
+        paddingRight: 100
     },
     listText: {
-        width: 220,
+        //width: 220,
         fontSize: 25,
         fontFamily: 'Verdana',
         paddingRight: 10,
@@ -302,13 +298,13 @@ const styles = StyleSheet.create({
     },
     informationBox: {
         width: Dimensions.get('window').width - 30,
-        height: 250,
+        //height: 260,
         //borderWidth: 1,
         backgroundColor: 'white',
         elevation: 3,
         justifyContent: 'center',
         alignItems: 'center',
-        //padding: 10,
+        padding: 10,
     },
     detail: {
         color: 'black',
@@ -324,7 +320,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         flexWrap: 'wrap',
         //borderWidth: 1,
-        paddingHorizontal: 5
+        paddingHorizontal: 10,
     },
     headerDetail: {
         color: 'black',

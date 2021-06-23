@@ -36,6 +36,8 @@
         "Create time": "Create time",
         "Certificated by": "Certificated by",
         "File name": "File name",
-        "Yes or no": "?"
+        "Yes or no": "?",
+        "Digital sign success": "Digital sign success!",
+        "Logging in": "Logging in..."
     }
 }

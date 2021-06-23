@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native
 import { MenuProvider } from 'react-native-popup-menu';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
-import uuid from 'react-native-uuid';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
 
@@ -182,7 +181,7 @@ function WorkFlowScreen({ navigation }) {
                     <Icon name='folder' />
                     <Text>
                         CHOOSE FILE
-                </Text>
+                    </Text>
                 </TouchableOpacity>
 
                 <View style={styles.box2}>

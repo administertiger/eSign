@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, BackHandler, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, BackHandler, ActivityIndicator, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import IconAnt from 'react-native-vector-icons/dist/AntDesign';
 import axios from 'axios';
@@ -10,13 +10,30 @@ function HomeScreen({ navigation }) {
 
     const { t, i18n } = useTranslation();
 
+    useEffect(() => {
+        const backAction = () => {
+            Alert.alert("Hold on!", "Are you sure you want to go back?", [
+                {
+                    text: "Cancel",
+                    onPress: () => null,
+                    style: "cancel"
+                },
+                { text: "YES", onPress: () => BackHandler.exitApp() }
+            ]);
+            return true;
+        };
+
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
 
     useEffect(() => {
         getList();
         getUserProfile();
-        BackHandler.addEventListener('hardwareBackPress', function () {
-            return true;
-        });
     }, []);
 
     const [documents, setDocuments] = useState([]);
