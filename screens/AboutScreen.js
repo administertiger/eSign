@@ -8,7 +8,7 @@ function AboutScreen({ navigation }) {
 
     return (
         <View style={styles.box} >
-            <View style={{ paddingBottom: 20, }}>
+            <View style={{ paddingBottom: 30, }}>
                 <Text style={{ fontSize: 16 }}>          {t('eSings app is an electronic signature mobile app that help you sign electronic documents both electronic sign with your signature picture file or digital sign by your certificate from certificate authority (CA).')}
                 </Text>
                 <Text style={{ fontSize: 16 }}>          {t("This mobile application can help you sign electronic documents anywhere anytime with fast and easy.")}</Text>
@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         fontSize: 20,
+        fontWeight: 'bold'
     },
     detail: {
         fontSize: 15

@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
-import { View, Text, StyleSheet, Dimensions, Modal, Button, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Modal, ScrollView, TouchableOpacity, Alert, BackHandler, Linking } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { authorize } from 'react-native-app-auth';
+import { authorize, revoke, } from 'react-native-app-auth';
 import { Configs } from '../components/configs';
 
 function SideBar({ ...props }) {
@@ -77,61 +77,41 @@ function SideBar({ ...props }) {
             console.log(error);
         })
     }
-    //-------------------------Get login--------------------------
-    const handleAuthorize = useCallback(
-        async provider => {
-            try {
-                //const config = Configs[provider];
-                const config = provider
-                const newAuthState = await authorize(config);
+    //-------------------------Get logout--------------------------
+    async function logout() {
+        const result = await revoke(Configs.adb2c, {
+            tokenToRevoke: global.token,
+            includeBasicAuth: true,
+            sendClientId: true,
+        });
 
-                //setAuthState({
-                //    hasLoggedInOnce: false,
-                //    provider: provider,
-                //    ...newAuthState
-                //});
-
-                getUserProfile(newAuthState.accessToken)
-                global.token = newAuthState.accessToken; //Get accessToken
-                console.log('User token: ', newAuthState);
-
-            } catch (error) {
-                Alert.alert('Failed to log in', error.message);
-            }
-        }
-    );
-
-    //----------------------User profile-------------------------
-    function getUserProfile(token) {
-        axios.get(API_URL + '/accounts',  //Account API
-            {
-                headers: {
-                    'Authorization': 'Bearer ' + token
-                }
-            })
-            .then((response) => {
-                console.log(response);
-                if (response.data) {
-                    i18n.changeLanguage(response.data.settings.language)
-
-                    //Set Global profile
-                    global.country = response.data.profiles.country;
-                    global.email = response.data.profiles.email;
-                    global.firstName = 'Kuy';
-                    global.lastName = response.data.profiles.lastName;
-                    global.name = response.data.profiles.name
-
-                    console.log('Profile set!!', global.firstName);
-                    props.navigation.closeDrawer();
-                }
-
-            }, (error) => {
-                console.log(error);
-
-            })
+        global.token = '';
+        props.navigation.navigate('LoginScreen')
+        console.log("result = ", result)
     }
+
+    //const handleAuthorize = useCallback(
+    //    async provider => {
+    //        try {
+    //            //const config = Configs[provider];
+    //            const config = provider
+    //            const newAuthState = await authorize(config);
+    //
+    //            global.token = newAuthState.accessToken; //Get accessToken
+    //            global.refreshToken = newAuthState.refreshToken
+    //            getUserProfile(newAuthState.accessToken)
+    //            console.log('User token: ', newAuthState);
+    //
+    //        } catch (error) {
+    //            //Alert.alert('Failed to log in', error.message);
+    //            BackHandler.exitApp();
+    //        }
+    //    }
+    //);
+
     return (
         <View style={{ flex: 1 }}>
+            {/* language modal */}
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -185,6 +165,7 @@ function SideBar({ ...props }) {
                     onPress={() => props.navigation.navigate('CertificateDrawer')} />
 
             </DrawerContentScrollView>
+
             <View style={styles.bottomContainer}>
                 <DrawerItem
                     label={t('Change language')}
@@ -204,7 +185,7 @@ function SideBar({ ...props }) {
                     label={t('Signout')}
                     labelStyle={{ color: 'white', }}
                     icon={() => <Icon2 name='sign-out-alt' size={23} color='white' />}
-                    onPress={() => { handleAuthorize(Configs.logout) }} />
+                    onPress={() => { logout(), props.navigation.push('LoginScreen') }} />
             </View>
 
         </View>

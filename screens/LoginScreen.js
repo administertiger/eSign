@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Button, StyleSheet, Text, Alert, ActivityIndicator } from 'react-native';
+import { View, Button, StyleSheet, Text, Alert, ActivityIndicator, BackHandler } from 'react-native';
 import { authorize } from 'react-native-app-auth';
 import { Configs } from '../components/configs';
 import Icon from 'react-native-vector-icons/dist/FontAwesome5'
@@ -22,7 +22,8 @@ function LoginScreen({ navigation }) {
     const [authState, setAuthState] = useState(initialState);
 
     useEffect(() => {
-        handleAuthorize(Configs.login)
+        handleAuthorize(Configs.adb2c)
+        console.log('token = ', global.token)
     }, [])
 
     //----------------------User profile-------------------------
@@ -46,7 +47,7 @@ function LoginScreen({ navigation }) {
                     global.name = response.data.profiles.name
 
                     console.log('Profile set!!', global.name);
-                    navigation.navigate('MainScreen');
+                    navigation.push('MainScreen');
                 }
 
             }, (error) => {
@@ -69,12 +70,23 @@ function LoginScreen({ navigation }) {
                     ...newAuthState
                 });
 
-                getUserProfile(newAuthState.accessToken)
                 global.token = newAuthState.accessToken; //Get accessToken
+                global.refreshToken = newAuthState.refreshToken
+                getUserProfile(newAuthState.accessToken)
                 console.log('User token: ', newAuthState);
 
             } catch (error) {
-                Alert.alert('Failed to log in', error.message);
+                Alert.alert("Hold on!", "Are you sure you want to exit?", [
+                    {
+                        text: "Login",
+                        onPress: () => handleAuthorize(Configs.adb2c),
+                        style: "cancel"
+                    },
+                    { text: "Exit", onPress: () => BackHandler.exitApp() }
+                ]);
+                return true;
+
+
             }
         }
     );
@@ -94,7 +106,7 @@ function LoginScreen({ navigation }) {
             <View style={{ justifyContent: 'center' }}>
                 {!authState.accessToken ? (
                     <View style={{ marginHorizontal: 40 }}>
-                        <Text style={styles.text}>{t('Logging in')}</Text>
+                        <ActivityIndicator size='large' color='black' />
                     </View>
                 ) : null}
             </View>

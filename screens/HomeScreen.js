@@ -5,14 +5,20 @@ import IconAnt from 'react-native-vector-icons/dist/AntDesign';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
+import { refreshToken } from '../components/refreshToken';
+
 function HomeScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
 
     const { t, i18n } = useTranslation();
 
     useEffect(() => {
+        //Refrsh token
+        refreshToken();
+
+        //Back button
         const backAction = () => {
-            Alert.alert("Hold on!", "Are you sure you want to go back?", [
+            Alert.alert("Hold on!", "Are you sure you want to exit?", [
                 {
                     text: "Cancel",
                     onPress: () => null,
@@ -22,7 +28,6 @@ function HomeScreen({ navigation }) {
             ]);
             return true;
         };
-
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
             backAction
@@ -49,7 +54,7 @@ function HomeScreen({ navigation }) {
                 }
             })
             .then((response) => {
-                console.log('response = ', response);
+                //console.log('response = ', response);
                 if (response.data) {
                     //console.log('Documents List: ', response.data);
 
@@ -59,7 +64,7 @@ function HomeScreen({ navigation }) {
 
                     //Merge File docs array and Certification array togethor.
                     const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
-                    console.log('documents2 = ', merge)
+                    console.log('documents = ', merge)
                     setDocuments(merge);
                     setIsLoading(false);
                 }
@@ -94,7 +99,7 @@ function HomeScreen({ navigation }) {
         const createDateFormat = item.signedTime[8] + item.signedTime[9] + '/' + item.signedTime[5] + item.signedTime[6] + '/' + item.signedTime[0] + item.signedTime[1] + item.signedTime[2] + item.signedTime[3]
         //console.log(createDateFormat);
         const createTimeFormat = item.signedTime[11] + item.signedTime[12] + item.signedTime[13] + item.signedTime[14] + item.signedTime[15] + item.signedTime[16] + item.signedTime[17] + item.signedTime[18]
-        console.log(createTimeFormat);
+        //console.log(createTimeFormat);
 
         return (
             <TouchableOpacity style={styles.renderBox}>

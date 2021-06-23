@@ -2,22 +2,27 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, BackHandler, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon2 from 'react-native-vector-icons/dist/FontAwesome5';
+import IconAnt from 'react-native-vector-icons/dist/AntDesign';
 import DocumentPicker from 'react-native-document-picker';
 import axios from 'axios';
 import * as RNFS from 'react-native-fs';
 import base64 from 'react-native-base64'
 import { useTranslation } from 'react-i18next';
+import { refreshToken } from '../components/refreshToken';
 
 const forge = require('node-forge');
 
 function Certificate({ navigation }) {
 
     useEffect(() => {
+        //Refrsh token
+        refreshToken();
+
+        //Handle back button
         const backAction = () => {
             navigation.navigate('HomeDrawer');
             return true;
         };
-
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
             backAction
@@ -328,11 +333,11 @@ function Certificate({ navigation }) {
                 </View>
                 <View style={{ flexDirection: 'row', position: 'absolute', right: 10 }}>
                     <TouchableOpacity onPress={() => changeCertification(item.id)} >
-                        <Icon name='check-circle' size={40} />
+                        <IconAnt name='checkcircle' size={40} />
                     </TouchableOpacity>
                     <Text>  </Text>
                     <TouchableOpacity onPress={() => DeleteModal(item)} >
-                        <Icon name='times-circle' size={40} />
+                        <IconAnt name='closecircle' size={40} />
                     </TouchableOpacity>
                 </View>
 

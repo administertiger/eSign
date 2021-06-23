@@ -248,6 +248,7 @@ function App() {
                     options={
                         {
                             headerShown: false,
+
                         }} />
 
                 <Stack.Screen

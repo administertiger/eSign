@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { refreshToken } from '../components/refreshToken';
 
 import Pdf from 'react-native-pdf';
 
@@ -21,6 +22,7 @@ function WorkScreen({ navigation }) {
 
     useEffect(() => {
         handleChooseFile();
+        refreshToken();
 
     }, [])
     //useEffect(() => {

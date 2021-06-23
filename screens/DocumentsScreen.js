@@ -7,6 +7,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Pdf from 'react-native-pdf';
 import RNFetchBlob from 'rn-fetch-blob';
 import { useTranslation } from 'react-i18next';
+import { refreshToken } from '../components/refreshToken';
 
 function DocumentsScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
@@ -16,7 +17,7 @@ function DocumentsScreen({ navigation }) {
     useEffect(() => {
         //handleAuthorize(Configs.adb2c);
         getList();
-
+        refreshToken();
     }, []);
 
     //-----------------------Get & Limit list items---------------------
