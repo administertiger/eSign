@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, BackHandler, ActivityIndicator, Alert, DeviceEventEmitter } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, BackHandler, ActivityIndicator, Alert, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import IconAnt from 'react-native-vector-icons/dist/AntDesign';
 import axios from 'axios';
@@ -13,13 +13,19 @@ function HomeScreen({ navigation }) {
     const { t, i18n } = useTranslation();
 
     useEffect(() => {
-        //Refrsh token
-        refreshToken();
+        getList();
+        getUserProfile();
+        console.log('Token = ', global.token)
+    }, []);
 
-        //Back button
+    //Backhandler handle-------------------
+    useEffect(() => {
+        //Handle back button
         const backAction = () => {
-            BackHandler.exitApp();
+            setBackHandler(true);
             return true;
+            //navigation.navigate('HomeDrawer');
+            //return true;
         };
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
@@ -29,24 +35,10 @@ function HomeScreen({ navigation }) {
         return () => backHandler.remove();
     }, []);
 
-    useEffect(() => {
-        DeviceEventEmitter.addListener(
-            'ON_RECENT_APP_BUTTON_PRESSED',
-            () => {
-                console.log('You tapped the home button!')
-            })
-
-    })
-
-    useEffect(() => {
-        getList();
-        getUserProfile();
-        console.log('Token = ', global.token)
-    }, []);
-
     const [documents, setDocuments] = useState([]);
     const [certificates, setCertificates] = useState([]);
     const [isLoading, setIsLoading] = useState(true)
+    const [backHandler, setBackHandler] = useState(false)
 
     //--------------------Get documents--------------------
     function getList() {
@@ -117,6 +109,25 @@ function HomeScreen({ navigation }) {
 
     return (
         <View style={{ flex: 1 }}>
+            {/* Backhandler */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={backHandler}
+                onRequestClose={() => BackHandler.exitApp()}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Tab again to exit')}</Text>
+
+                        <View style={styles.alertButton}>
+                            <TouchableOpacity onPress={() => setBackHandler(false)}>
+                                <Text style={styles.alertButtonSuccess}>{t('Cancel')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
 
             <View style={styles.box}>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', paddingTop: 5 }}>
@@ -246,7 +257,29 @@ const styles = StyleSheet.create({
     homeHeaderText: {
         fontSize: 23,
         color: 'white'
-    }
+    },
+    //-------Modal--------
+    alertBox: {
+        //alignItems: 'center',
+        //justifyContent: 'center',
+        backgroundColor: 'white',
+        width: Dimensions.get('window').width - 70,
+        height: 200,
+        padding: 25,
+        elevation: 5,
+    },
+    alertButtonSuccess: {
+        fontSize: 19,
+        color: 'black',
+    },
+    alertButton: {
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+        flex: 1,
+        paddingRight: 15,
+        flexDirection: 'row',
+
+    },
 })
 
 export default HomeScreen;

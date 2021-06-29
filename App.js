@@ -35,6 +35,8 @@ const Drawer = createDrawerNavigator();
 function DrawerNavigator() {
     return (
         <Drawer.Navigator initialRouteName='HomeDrawer' drawerType='slide' drawerContent={props => <SideBar {...props} />} >
+            <Drawer.Screen name='LoginDrawer' component={LoginStack} />
+            <Drawer.Screen name='LogoutDrawer' component={LogoutStack} />
             <Drawer.Screen name="HomeDrawer" component={HomeStack} options={{ unmountOnBlur: true, }} />
             <Drawer.Screen name="DocumentsDrawer" component={DocumentsStack} options={{ unmountOnBlur: true, }} />
             <Drawer.Screen name="AboutDrawer" component={AboutStack} options={{ unmountOnBlur: true }} />
@@ -129,6 +131,34 @@ function TabNavigator2() {
 }
 
 //----------Stacks----------
+function LoginStack() {
+    return (
+        <Stack.Navigator >
+            <Stack.Screen
+                name='LoginScreen'
+                component={LoginScreen}
+                options={
+                    {
+                        headerShown: false,
+                    }} />
+        </Stack.Navigator>
+
+    )
+}
+function LogoutStack() {
+    return (
+        <Stack.Navigator >
+            <Stack.Screen
+                name='LoginScreen'
+                component={LogoutScreen}
+                options={
+                    {
+                        headerShown: false,
+                    }} />
+        </Stack.Navigator>
+
+    )
+}
 function HomeStack({ navigation }) {
     const headerHeight = useHeaderHeight();
     const headerWidth = Dimensions.get('window').width;

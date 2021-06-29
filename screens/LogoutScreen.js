@@ -19,7 +19,6 @@ function LogoutScreen({ navigation }) {
 
     const { t, i18n } = useTranslation();
 
-    const [authState, setAuthState] = useState(initialState);
     const [homepageReady, setHomepageReady] = useState(false);
 
     useEffect(() => {
@@ -54,8 +53,8 @@ function LogoutScreen({ navigation }) {
                     setHomepageReady(true);
 
                     setTimeout(() => {
-                        navigation.navigate('MainScreen');
-                    }, 1000)
+                        navigation.navigate('HomeDrawer');
+                    }, 1500)
                 }
 
             }, (error) => {
@@ -73,12 +72,6 @@ function LogoutScreen({ navigation }) {
                 const newAuthState = await authorize(config);
 
                 console.log('auth = ', newAuthState)
-
-                setAuthState({
-                    hasLoggedInOnce: false,
-                    provider: provider,
-                    ...newAuthState
-                });
 
                 global.token = newAuthState.accessToken; //Get accessToken
                 global.refreshToken = newAuthState.refreshToken

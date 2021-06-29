@@ -103,7 +103,7 @@ function SideBar({ ...props }) {
         global.lastName = '';
         global.name = '';
 
-        props.navigation.push('LogoutScreen')
+        props.navigation.navigate('LogoutDrawer')
         console.log("result = ", result)
     }
 
@@ -170,38 +170,6 @@ function SideBar({ ...props }) {
             }
         }
     );
-
-    //----------------------User profile-------------------------
-    function getUserProfile() {
-        axios.get(API_URL + '/accounts',  //Account API
-            {
-                headers: {
-                    'Authorization': 'Bearer ' + global.token
-                }
-            })
-            .then((response) => {
-                console.log(response);
-                if (response.data) {
-                    //i18n.changeLanguage(response.data.settings.language)
-
-                    //Set Global profile
-                    //global.country = response.data.profiles.country;
-                    //global.email = response.data.profiles.email;
-                    //global.firstName = response.data.profiles.firstName;
-                    //global.lastName = response.data.profiles.lastName;
-                    //global.name = response.data.profiles.name
-                    //global.language = response.data.settings.language
-
-                    //setProfile(response.data.profiles);
-
-                    console.log('Profile set!!', global.name);
-                }
-
-            }, (error) => {
-                console.log(error);
-
-            })
-    }
 
     return (
         <View style={{ flex: 1 }}>

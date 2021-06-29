@@ -41,6 +41,7 @@
         "Logging in": "Logging in...",
         "Are you sure you want to exit": "Are you sure you want to exit?",
         "Hold on": "Hold on!",
-        "Loading": "Loading..."
+        "Loading": "Loading...",
+        "Tab again to exit": "Press back again to exit"
     }
 }

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Modal, Dimensions, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Modal, Dimensions, Button, BackHandler } from 'react-native';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IconFeather from 'react-native-vector-icons/dist/Feather';
@@ -18,6 +18,21 @@ function DocumentsScreen({ navigation }) {
         //handleAuthorize(Configs.adb2c);
         getList();
         refreshToken();
+    }, []);
+
+    useEffect(() => {
+        //Back button
+        const backAction = () => {
+            navigation.navigate('HomeTab');
+            //console.log('back')
+            return true;
+        };
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
     }, []);
 
     //-----------------------Get & Limit list items---------------------

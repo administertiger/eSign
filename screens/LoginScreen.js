@@ -19,7 +19,6 @@ function LoginScreen({ navigation }) {
 
     const { t, i18n } = useTranslation();
 
-    const [authState, setAuthState] = useState(initialState);
     const [homepageReady, setHomepageReady] = useState(false);
 
     useEffect(() => {
@@ -54,13 +53,13 @@ function LoginScreen({ navigation }) {
                     setHomepageReady(true);
 
                     setTimeout(() => {
-                        navigation.navigate('MainScreen');
+                        navigation.push('MainScreen');
                     }, 1000)
                 }
 
             }, (error) => {
                 console.log(error);
-
+                Alert.alert('error')
             })
     }
 
@@ -73,12 +72,6 @@ function LoginScreen({ navigation }) {
                 const newAuthState = await authorize(config);
 
                 console.log('auth = ', newAuthState)
-
-                setAuthState({
-                    hasLoggedInOnce: false,
-                    provider: provider,
-                    ...newAuthState
-                });
 
                 global.token = newAuthState.accessToken; //Get accessToken
                 global.refreshToken = newAuthState.refreshToken

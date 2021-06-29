@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, BackHandler, Dimensions, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon2 from 'react-native-vector-icons/dist/FontAwesome5';
 import IconAnt from 'react-native-vector-icons/dist/AntDesign';
@@ -14,22 +14,7 @@ const forge = require('node-forge');
 
 function Certificate({ navigation }) {
 
-    //-------------------Backhandler handle-------------------
-    useEffect(() => {
-        //Handle back button
-        const backAction = () => {
-            setBackHandler(true);
-            return true;
-            //navigation.navigate('HomeDrawer');
-            //return true;
-        };
-        const backHandler = BackHandler.addEventListener(
-            "hardwareBackPress",
-            backAction
-        );
 
-        return () => backHandler.remove();
-    }, []);
 
     const API_URL = 'https://ws.esigns.cloud';
 
@@ -52,7 +37,6 @@ function Certificate({ navigation }) {
     const [successModal, setSuccessModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [beforeDeleteModal, setBeforeDeleteModal] = useState(false)
-    const [backHandler, setBackHandler] = useState(false)
 
 
     useState(() => {
@@ -548,24 +532,6 @@ function Certificate({ navigation }) {
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => cancelDeleteModal()}>
                                 <Text style={styles.alertButtonText}>{t('Cancel')}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </Modal>
-            {/* Backhandler */}
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={backHandler}
-                onRequestClose={() => navigation.navigate('HomeDrawer')}>
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                    <View style={styles.alertBox}>
-                        <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Tab again to exit')}</Text>
-
-                        <View style={styles.alertButton}>
-                            <TouchableOpacity onPress={() => setBackHandler(false)}>
-                                <Text style={styles.alertButtonSuccess}>{t('Cancel')}</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
