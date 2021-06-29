@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Dimensions, View, Text, ActivityIndicator, TouchableOpacity, Alert, Modal } from 'react-native';
+import { StyleSheet, Dimensions, View, Text, ActivityIndicator, TouchableOpacity, Alert, Modal, BackHandler } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
@@ -17,6 +17,25 @@ function WorkScreen({ navigation }) {
     const [file, setFile] = useState({});
     const [loading, setLoading] = useState(false);
     const [successModal, setSuccessModal] = useState(false);
+    const [backHandler, setBackHandler] = useState(false)
+
+
+    //-------------------Backhandler handle-------------------
+    useEffect(() => {
+        //Handle back button
+        const backAction = () => {
+            setBackHandler(true);
+            return true;
+            //navigation.navigate('HomeDrawer');
+            //return true;
+        };
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
 
     //------------------------handle choos file--------------------------
 
@@ -166,6 +185,25 @@ function WorkScreen({ navigation }) {
                             </View>
                         </View>
                     </Modal>
+                    {/* Backhandler */}
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={backHandler}
+                        onRequestClose={() => navigation.navigate('HomeDrawer')}>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                            <View style={styles.alertBox}>
+                                <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Tab again to exit')}</Text>
+
+                                <View style={styles.alertButton}>
+                                    <TouchableOpacity onPress={() => setBackHandler(false)}>
+                                        <Text style={styles.alertButtonSuccess}>{t('Cancel')}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                    </Modal>
+
                     <ShowPdf />
                     <View style={styles.singButtonBox} >
                         <TouchableOpacity style={styles.singButton} onPress={() => handleUploadFile()}>

@@ -51,6 +51,9 @@
         "XAdES (XML Advanced Electronic Signatures)": "รองรับการลงลายเซ็นแบบเชื่อถือได้ XAdES (XML Advanced Electronic Signatures)",
         "Use your own .p12 or .pfx certificate file for digital sign.": "รองรับใบรับรองอิเล็กทรอนิกส์จากผู้ออกใบรับรองอิเล็กทรอนิกส์ตาม มาตรา 28 สำหรับการลงลายเซ็นดิจิทัล",
         "Logging in": "กำลังเข้าสู่ระบบ...",
-        "Are you sure you want to exit": "คุณแน่ใจว่าจะออกหรือไม่?"
+        "Are you sure you want to exit": "คุณแน่ใจว่าจะออกหรือไม่?",
+        "Reset password": "รีเซ็ทรหัสผ่าน",
+        "Tab again to exit": "กดอีกครั้งเพื่อออก",
+        "Loading": "โหลดข้อมูล..."
     }
 }

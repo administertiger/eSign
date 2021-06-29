@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, BackHandler, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Button, Modal, TextInput, BackHandler, Dimensions, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import Icon2 from 'react-native-vector-icons/dist/FontAwesome5';
 import IconAnt from 'react-native-vector-icons/dist/AntDesign';
@@ -14,14 +14,14 @@ const forge = require('node-forge');
 
 function Certificate({ navigation }) {
 
+    //-------------------Backhandler handle-------------------
     useEffect(() => {
-        //Refrsh token
-        refreshToken();
-
         //Handle back button
         const backAction = () => {
-            navigation.navigate('HomeDrawer');
+            setBackHandler(true);
             return true;
+            //navigation.navigate('HomeDrawer');
+            //return true;
         };
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
@@ -52,9 +52,13 @@ function Certificate({ navigation }) {
     const [successModal, setSuccessModal] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [beforeDeleteModal, setBeforeDeleteModal] = useState(false)
+    const [backHandler, setBackHandler] = useState(false)
 
 
     useState(() => {
+        //Refrsh token
+        refreshToken();
+
         getUserProfile();
     }, [])
 
@@ -175,6 +179,7 @@ function Certificate({ navigation }) {
 
     //----------Submit-----------
     function handleSubmit() {
+        refreshToken();
 
         if (text) {
             //console.log('test');
@@ -371,6 +376,19 @@ function Certificate({ navigation }) {
         setFooterLoading(false);
     }
 
+    //-------------------------------------
+    function ShowCurrentCertificate() {
+        if (currentCertificate == {}) {
+            return null;
+        } else {
+            return (
+                <TouchableOpacity style={{ paddingVertical: 15, backgroundColor: 'white', elevation: 3, marginHorizontal: 10 }} onPress={() => Detail()} >
+                    <Text style={styles.currentCertificate}><Icon2 name='user-check' size={14} color='#54c489' />  {currentCertificate.certificateName}</Text>
+                </TouchableOpacity>
+            )
+        }
+    }
+
     return (
         <View style={{ flex: 1 }}>
             {/* uploadModalLoading */}
@@ -399,7 +417,7 @@ function Certificate({ navigation }) {
                             onChangeText={onChangeText}
                             value={text}
                         />
-                        <View style={{ flexDirection: 'row', paddingTop: 5 }}>
+                        <View style={{ flexDirection: 'row', paddingTop: 10 }}>
                             <TouchableOpacity onPress={() => handleSubmit()}>
                                 <Text style={styles.modalSubmitButton}>{t('Submit')}</Text>
                             </TouchableOpacity>
@@ -535,16 +553,30 @@ function Certificate({ navigation }) {
                     </View>
                 </View>
             </Modal>
+            {/* Backhandler */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={backHandler}
+                onRequestClose={() => navigation.navigate('HomeDrawer')}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Tab again to exit')}</Text>
 
-            <View style={{ paddingVertical: 10 }}>
-                <View style={{ borderTopWidth: 1, marginTop: 10, marginHorizontal: 15, }} />
+                        <View style={styles.alertButton}>
+                            <TouchableOpacity onPress={() => setBackHandler(false)}>
+                                <Text style={styles.alertButtonSuccess}>{t('Cancel')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
-                <TouchableOpacity style={{ paddingVertical: 10 }} onPress={() => Detail()}>
-                    <Text style={styles.currentCertificate}>{currentCertificate.certificateName}</Text>
-                </TouchableOpacity>
-
-                <View style={{ borderTopWidth: 1, marginBottom: 10, marginHorizontal: 15, }} />
+            <View style={{ paddingVertical: 10, marginBottom: 10, }}>
+                <Text style={{ textAlign: 'center', paddingVertical: 10, fontSize: 22 }}>Your certificate</Text>
+                <ShowCurrentCertificate />
             </View>
+
             <View style={styles.showCertificate}>
                 <FlatList data={certificate}
                     renderItem={renderItem}
@@ -613,6 +645,7 @@ const styles = StyleSheet.create({
     currentCertificate: {
         fontSize: 20,
         textAlign: 'center',
+        paddingHorizontal: 10
     },
 
     //Modal---------
@@ -679,12 +712,12 @@ const styles = StyleSheet.create({
 
     },
     modalSubmitButton: {
-        fontSize: 19,
+        fontSize: 17,
         paddingHorizontal: 20,
         color: 'black',
     },
     modalCancelButton: {
-        fontSize: 19,
+        fontSize: 17,
         paddingHorizontal: 20,
         color: '#d44253',
     },
@@ -717,7 +750,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        elevation: 5,
+        elevation: 3,
         //borderWidth: 1,
         borderRadius: 0,
         marginBottom: 15,

@@ -8,5 +8,5 @@ export async function refreshToken() {
     global.token = result.accessToken
     global.refreshToken = result.refreshToken
 
-    //console.log('refresh555 = ', result)
+    console.log('refresh = ', result)
 }

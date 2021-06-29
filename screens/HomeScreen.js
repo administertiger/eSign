@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, BackHandler, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Dimensions, BackHandler, ActivityIndicator, Alert, DeviceEventEmitter } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import IconAnt from 'react-native-vector-icons/dist/AntDesign';
 import axios from 'axios';
@@ -18,14 +18,7 @@ function HomeScreen({ navigation }) {
 
         //Back button
         const backAction = () => {
-            Alert.alert("Hold on!", "Are you sure you want to exit?", [
-                {
-                    text: "Cancel",
-                    onPress: () => null,
-                    style: "cancel"
-                },
-                { text: "YES", onPress: () => BackHandler.exitApp() }
-            ]);
+            BackHandler.exitApp();
             return true;
         };
         const backHandler = BackHandler.addEventListener(
@@ -37,8 +30,18 @@ function HomeScreen({ navigation }) {
     }, []);
 
     useEffect(() => {
+        DeviceEventEmitter.addListener(
+            'ON_RECENT_APP_BUTTON_PRESSED',
+            () => {
+                console.log('You tapped the home button!')
+            })
+
+    })
+
+    useEffect(() => {
         getList();
         getUserProfile();
+        console.log('Token = ', global.token)
     }, []);
 
     const [documents, setDocuments] = useState([]);

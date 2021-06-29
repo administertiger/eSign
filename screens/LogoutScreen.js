@@ -14,7 +14,7 @@ const initialState = {
     refreshToken: ''
 };
 
-function LoginScreen({ navigation }) {
+function LogoutScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
 
     const { t, i18n } = useTranslation();
@@ -23,7 +23,7 @@ function LoginScreen({ navigation }) {
     const [homepageReady, setHomepageReady] = useState(false);
 
     useEffect(() => {
-        handleAuthorize(Configs.adb2c)
+        handleAuthorize(Configs.adb2c_2)
     }, [])
 
 
@@ -145,4 +145,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default LoginScreen;
+export default LogoutScreen;

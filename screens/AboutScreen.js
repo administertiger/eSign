@@ -1,13 +1,51 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Modal, BackHandler } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import { useTranslation } from 'react-i18next';
 
 function AboutScreen({ navigation }) {
     const { t, i18n } = useTranslation();
 
+    const [backHandler, setBackHandler] = useState(false)
+
+    //-------------------Backhandler handle-------------------
+    useEffect(() => {
+        //Handle back button
+        const backAction = () => {
+            setBackHandler(true);
+            return true;
+            //navigation.navigate('HomeDrawer');
+            //return true;
+        };
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            backAction
+        );
+
+        return () => backHandler.remove();
+    }, []);
+
     return (
         <View style={styles.box} >
+            {/* Backhandler */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={backHandler}
+                onRequestClose={() => navigation.navigate('HomeDrawer')}>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <View style={styles.alertBox}>
+                        <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Tab again to exit')}</Text>
+
+                        <View style={styles.alertButton}>
+                            <TouchableOpacity onPress={() => setBackHandler(false)}>
+                                <Text style={styles.alertButtonSuccess}>{t('Cancel')}</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
             <View style={{ paddingBottom: 30, }}>
                 <Text style={{ fontSize: 16 }}>          {t('eSings app is an electronic signature mobile app that help you sign electronic documents both electronic sign with your signature picture file or digital sign by your certificate from certificate authority (CA).')}
                 </Text>
@@ -16,7 +54,7 @@ function AboutScreen({ navigation }) {
 
             <Text style={styles.textHeader}>{t('Digital Signature')}</Text>
 
-            <View style={{ paddingLeft: 15 }}>
+            <View style={{ paddingHorizontal: 7 }}>
                 <View style={styles.detailBox}>
                     <Text style={styles.detail}>- </Text>
                     <Text style={styles.detail}>{t('Support PDF file.')}</Text>
@@ -84,7 +122,8 @@ const styles = StyleSheet.create({
     },
     detailBox: {
         paddingTop: 5,
-        flexDirection: 'row'
+        flexDirection: 'row',
+
     },
     //Header---------
     homeHeader: {
@@ -108,7 +147,29 @@ const styles = StyleSheet.create({
     homeHeaderText: {
         fontSize: 23,
         color: 'white',
-    }
+    },
+    //-------Modal--------
+    alertBox: {
+        //alignItems: 'center',
+        //justifyContent: 'center',
+        backgroundColor: 'white',
+        width: Dimensions.get('window').width - 70,
+        height: 200,
+        padding: 25,
+        elevation: 5,
+    },
+    alertButtonSuccess: {
+        fontSize: 19,
+        color: 'black',
+    },
+    alertButton: {
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+        flex: 1,
+        paddingRight: 15,
+        flexDirection: 'row',
+
+    },
 })
 
 export default AboutScreen;

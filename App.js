@@ -17,6 +17,7 @@ import LoginScreen from './screens/LoginScreen'
 import WorkScreen from './screens/WorkScreen'
 import Certificate from './screens/Certificate'
 import GoToWork from './screens/DummyPage'
+import LogoutScreen from './screens/LogoutScreen'
 
 import { HomeHeader } from './screens/HomeScreen'
 import { AboutHeader } from './screens/AboutScreen'
@@ -36,11 +37,10 @@ function DrawerNavigator() {
         <Drawer.Navigator initialRouteName='HomeDrawer' drawerType='slide' drawerContent={props => <SideBar {...props} />} >
             <Drawer.Screen name="HomeDrawer" component={HomeStack} options={{ unmountOnBlur: true, }} />
             <Drawer.Screen name="DocumentsDrawer" component={DocumentsStack} options={{ unmountOnBlur: true, }} />
-            <Drawer.Screen name="AboutDrawer" component={AboutStack} />
-            <Drawer.Screen name='CertificateDrawer' component={CertificateStack} />
+            <Drawer.Screen name="AboutDrawer" component={AboutStack} options={{ unmountOnBlur: true }} />
+            <Drawer.Screen name='CertificateDrawer' component={CertificateStack} options={{ unmountOnBlur: true }} />
             <Drawer.Screen name='GotoWorkDrawer' component={GoToWork} options={{ unmountOnBlur: true }} />
             <Drawer.Screen name='WorkDrawer' component={WorkStack} options={{ unmountOnBlur: true, swipeEnabled: false }} />
-
         </Drawer.Navigator>
     )
 }
@@ -244,13 +244,20 @@ function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName={'LoginScreen'}>
-                <Stack.Screen name='LoginScreen' component={LoginScreen}
+                <Stack.Screen
+                    name='LoginScreen'
+                    component={LoginScreen}
                     options={
                         {
                             headerShown: false,
-
                         }} />
-
+                <Stack.Screen
+                    name='LogoutScreen'
+                    component={LogoutScreen}
+                    options={
+                        {
+                            headerShown: false,
+                        }} />
                 <Stack.Screen
                     name='MainScreen'
                     component={DrawerNavigator}
@@ -260,6 +267,7 @@ function App() {
                         }
                     }
                 />
+
             </Stack.Navigator>
         </NavigationContainer>
     )
