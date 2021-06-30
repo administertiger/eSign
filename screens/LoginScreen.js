@@ -80,7 +80,7 @@ function LoginScreen({ navigation }) {
 
             } catch (error) {
                 BackHandler.exitApp()
-
+                console.log(error)
             }
         }
     );

@@ -1,5 +1,3 @@
-import React from 'react'
-
 export const Configs = {
     adb2c: {
         // From https://openidconnect.net/

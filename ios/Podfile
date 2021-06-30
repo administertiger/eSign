@@ -24,6 +24,8 @@ target 'Example' do
 
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
 
+  pod 'react-native-app-auth', :path => '../node_modules/react-native-app-auth'
+
   target 'ExampleTests' do
     inherit! :complete
     # Pods for testing

@@ -118,12 +118,6 @@ function HomeScreen({ navigation }) {
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <View style={styles.alertBox}>
                         <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Tab again to exit')}</Text>
-
-                        <View style={styles.alertButton}>
-                            <TouchableOpacity onPress={() => setBackHandler(false)}>
-                                <Text style={styles.alertButtonSuccess}>{t('Cancel')}</Text>
-                            </TouchableOpacity>
-                        </View>
                     </View>
                 </View>
             </Modal>

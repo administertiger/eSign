@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Dimensions, View, Text, ActivityIndicator, TouchableOpacity, Alert, Modal, BackHandler } from 'react-native';
+import { StyleSheet, Dimensions, View, Text, ActivityIndicator, TouchableOpacity, Alert, Modal, BackHandler, ScrollView } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon2 from 'react-native-vector-icons/FontAwesome5';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { refreshToken } from '../components/refreshToken';
+import SyntaxHighlighter from 'react-native-syntax-highlighter';
+import a11yDark from 'react-syntax-highlighter/dist/esm/styles/prism/a11y-dark';
 
 import Pdf from 'react-native-pdf';
+
+var RNFS = require('react-native-fs');
 
 function WorkScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
@@ -17,17 +21,14 @@ function WorkScreen({ navigation }) {
     const [file, setFile] = useState({});
     const [loading, setLoading] = useState(false);
     const [successModal, setSuccessModal] = useState(false);
-    const [backHandler, setBackHandler] = useState(false)
-
+    const [xmlText, setXmlText] = useState('')
 
     //-------------------Backhandler handle-------------------
     useEffect(() => {
         //Handle back button
         const backAction = () => {
-            setBackHandler(true);
+            navigation.navigate('HomeDrawer');
             return true;
-            //navigation.navigate('HomeDrawer');
-            //return true;
         };
         const backHandler = BackHandler.addEventListener(
             "hardwareBackPress",
@@ -52,19 +53,34 @@ function WorkScreen({ navigation }) {
     const handleChooseFile = async () => {
         //Opening Document Picker for selection of one file
         try {
-            const res = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf],
-            });
+            const results = await DocumentPicker.pick({
+                type: [DocumentPicker.types.allFiles],
+            })
 
-            console.log('res = ', res)
-            //Setting the state to show single file attributes
-            setFile(res);
+            console.log(results);
+
+            if (results.type === 'text/xml') {
+                setFile(results)
+                RNFS.readFile(results.uri)
+                    .then((file) => {
+                        setXmlText(file)
+                        console.log(file)
+                        console.log('XML!!!')
+                    })
+                    .catch((error) => console.log('err: ' + error));
+            } else if (results.type === 'application/pdf') {
+                setFile(results);
+                console.log('PDF!!!')
+            }
+
+
 
         } catch (err) {
             //Handling any exception (If any)
             if (DocumentPicker.isCancel(err)) {
                 //If user canceled the document selection
                 //alert('Canceled from single doc picker');
+                console.log('cancel')
                 navigation.navigate('HomeDrawer')
             } else {
                 //For Unknown Error
@@ -74,34 +90,72 @@ function WorkScreen({ navigation }) {
         }
     };
 
-    //----------------------------Show PDF-----------------------------
+    //----------------------------Show selected file-----------------------------
 
-    const ShowPdf = () => {
+    function ShowPdf() {
         const source = { uri: file.uri, cache: true };
 
         return (
-            <Pdf
-                source={source}
-                onLoadComplete={(numberOfPages, filePath) => {
-                    console.log(`number of pages: ${numberOfPages}`);
-                    //setTotalPage(numberOfPages);
-                }}
-                onPageChanged={(page, numberOfPages) => {
-                    console.log(`current page: ${page}`);
-                    //setCurrentPage(page);  //set the cuurentPage
-                }}
-                onError={(error) => {
-                    console.log(error);
-                }}
-                onPressLink={(uri) => {
-                    console.log(`Link presse: ${uri}`)
-                }}
-                style={styles.pdf} />
+            <View>
+                <Pdf
+                    source={source}
+                    onLoadComplete={(numberOfPages, filePath) => {
+                        console.log(`number of pages: ${numberOfPages}`);
+                        //setTotalPage(numberOfPages);
+                    }}
+                    onPageChanged={(page, numberOfPages) => {
+                        console.log(`current page: ${page}`);
+                        //setCurrentPage(page);  //set the cuurentPage
+                    }}
+                    onError={(error) => {
+                        console.log(error);
+                    }}
+                    onPressLink={(uri) => {
+                        console.log(`Link presse: ${uri}`)
+                    }}
+                    style={styles.pdf} />
+                <View style={styles.singButtonBox} >
+                    <TouchableOpacity style={styles.singButton} onPress={() => handleUpload()}>
+                        <Text style={styles.signText}>{t('Sign')} </Text>
+                        <Icon2 name='pen' size={20} style={{ color: 'white' }} />
+                    </TouchableOpacity>
+                </View>
+            </View>
         )
     }
 
+    function ShowXml() {
+        return (
+            <View style={{ backgroundColor: 'rgba(43, 43, 43, 0.95)' }}>
+                <View style={{ flex: 1, margin: -7, marginTop: -22, marginBottom: 5 }}>
+                    <SyntaxHighlighter
+                        language='javascript'
+                        style={a11yDark}
+                        highlighter={"prism" || "hljs"}>
+                        {xmlText}
+                    </SyntaxHighlighter>
+                </View>
+                <View style={{ alignItems: 'center', marginBottom: 25 }} >
+                    <TouchableOpacity style={styles.singButton} onPress={() => handleUpload()}>
+                        <Text style={styles.signText}>{t('Sign')} </Text>
+                        <Icon2 name='pen' size={20} style={{ color: 'white' }} />
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+        )
+    }
+
+    function DisplayFile() {
+        if (file.type === 'application/pdf') {
+            return ShowPdf();
+        } else {
+            return ShowXml();
+        }
+    }
+
     //----------------------handleUploadFile----------------------
-    function handleUploadFile() {
+    function handleUploadPdf() {
         console.log('file = ', file);
         setLoading(true);
 
@@ -152,6 +206,66 @@ function WorkScreen({ navigation }) {
                 console.log(error);
             })
     }
+    function handleUploadXml() {
+        console.log('file = ', file);
+        setLoading(true);
+
+        let formData = new FormData();
+        formData.append('file', file);
+
+        console.log('formData = ', formData)
+
+        axios({
+            method: 'POST',
+            url: API_URL + '/documents/xml/digitalsign',
+            data: formData._parts.length > 0 ? formData : null,
+            headers: {
+                'Authorization': 'Bearer ' + global.token,
+                "content-type": "multipart/form-data"
+            },
+        })
+            .then((response) => {
+                console.log('responsePost = ', response);
+                console.log('Done? = ', 'DONE!!');
+
+                //Get status of the file.
+                let myInterval = setInterval(() => {
+                    axios({
+                        method: 'GET',
+                        url: API_URL + '/jobs/' + response.data.id,
+                        headers: { 'Authorization': 'Bearer ' + global.token }
+                    }).then((response) => {
+                        console.log('Jobs = ', response.data.status)
+                        if (response.data.status === 'complete') {
+                            clearInterval(myInterval);
+                            console.log('Complete!')
+                            setSuccessModal(true);
+                            setLoading(false);
+                            //navigation.navigate('DocumentsDrawer')
+                        } else if (response.data.status === 'fail') {
+                            clearInterval(myInterval);
+                            console.log('Fail T_T')
+                            Alert.alert('Fail T_T')
+                            setLoading(false);
+                        }
+                    }), (error) => {
+                        console.log(error);
+                    }
+                }, 1000)
+
+            }, (error) => {
+                console.log(error);
+            })
+    }
+
+    function handleUpload() {
+        if (file.type === 'application/pdf') {
+            handleUploadPdf();
+        } else {
+            handleUploadXml();
+            console.log('XML');
+        }
+    }
 
     return (
         <View style={styles.container} >
@@ -185,32 +299,9 @@ function WorkScreen({ navigation }) {
                             </View>
                         </View>
                     </Modal>
-                    {/* Backhandler */}
-                    <Modal
-                        animationType="fade"
-                        transparent={true}
-                        visible={backHandler}
-                        onRequestClose={() => navigation.navigate('HomeDrawer')}>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                            <View style={styles.alertBox}>
-                                <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Tab again to exit')}</Text>
 
-                                <View style={styles.alertButton}>
-                                    <TouchableOpacity onPress={() => setBackHandler(false)}>
-                                        <Text style={styles.alertButtonSuccess}>{t('Cancel')}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </Modal>
+                    <DisplayFile />
 
-                    <ShowPdf />
-                    <View style={styles.singButtonBox} >
-                        <TouchableOpacity style={styles.singButton} onPress={() => handleUploadFile()}>
-                            <Text style={styles.signText}>{t('Sign')} </Text>
-                            <Icon2 name='pen' size={20} style={{ color: 'white' }} />
-                        </TouchableOpacity>
-                    </View>
                 </View>
             ) : null}
         </View>

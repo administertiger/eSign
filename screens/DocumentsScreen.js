@@ -8,6 +8,8 @@ import Pdf from 'react-native-pdf';
 import RNFetchBlob from 'rn-fetch-blob';
 import { useTranslation } from 'react-i18next';
 import { refreshToken } from '../components/refreshToken';
+import SyntaxHighlighter from 'react-native-syntax-highlighter';
+import a11yDark from 'react-syntax-highlighter/dist/esm/styles/prism/a11y-dark';
 
 function DocumentsScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
@@ -40,7 +42,8 @@ function DocumentsScreen({ navigation }) {
     const [itemCount, setItemCount] = useState(9);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedFileInfo, setSelectedFileInfo] = useState({});
-    const [fileUri, setFileUri] = useState('')
+    const [file, setFile] = useState({})
+    const [xmlText, setXmlText] = useState('')
 
     //Modal
     const [infoModal, setInfoModal] = useState(false);
@@ -141,9 +144,33 @@ function DocumentsScreen({ navigation }) {
 
     //----------------------------Show PDF-----------------------------
 
+
+
+    function getBlob(item) {
+        RNFetchBlob.fetch('GET', "https://ws.esigns.cloud/files/" + item.id, { 'Authorization': 'Bearer ' + global.token, })
+            .then((res) => {
+                console.log("Success = ", res);
+                if (res.type === 'base64') {
+                    setFile(res);
+                    console.log('PDF');
+                } else if (res.type === 'utf8') {
+                    setFile(res)
+                    setXmlText(res.data)
+                    console.log('XML')
+                    console.log(res.data)
+                }
+            })
+            .catch((err) => { console.log('error', err) }) // To execute when download cancelled and other errors
+    }
+
+    function handleShowPdf(item) {
+        getBlob(item);
+        setShowPdf(true);
+    }
+
     const ShowPdf = () => {
 
-        const source = { uri: "data:application/pdf;base64," + fileUri };
+        const source = { uri: "data:application/pdf;base64," + file.data };
 
         return (
             <Pdf
@@ -166,23 +193,33 @@ function DocumentsScreen({ navigation }) {
         )
     }
 
-    function getBlob(item) {
-        RNFetchBlob.fetch('GET', "https://ws.esigns.cloud/files/" + item.id, { 'Authorization': 'Bearer ' + global.token, })
-            .then((res) => {
-                console.log("Success = ", res);
-                setFileUri(res.data);
-            })
-            .catch((err) => { console.log('error', err) }) // To execute when download cancelled and other errors
+    function ShowXml() {
+        return (
+            <View style={{ backgroundColor: '#2B2B2B' }}>
+                <View style={{ margin: -7, marginVertical: -22, }}>
+                    <SyntaxHighlighter
+                        language='javascript'
+                        style={a11yDark}
+                        highlighter={"prism" || "hljs"}>
+                        {xmlText}
+                    </SyntaxHighlighter>
+                </View>
+            </View>
+
+        )
     }
 
-    function handleShowPdf(item) {
-        getBlob(item);
-        setShowPdf(true);
+    function DisplayFile() {
+        if (file.type === 'base64') {
+            return ShowPdf();
+        } else {
+            return ShowXml();
+        }
     }
 
     function closeShowPdf() {
         setShowPdf(false);
-        setFileUri('');
+        setFile({});
     }
 
     //----------------------Render Items---------------------------
@@ -244,14 +281,14 @@ function DocumentsScreen({ navigation }) {
                     </View>
                 </View>
             </Modal>
-            {/* Show pdf modal */}
+            {/* Show file modal */}
             <Modal
                 animationType='slide'
                 transparent={false}
                 visible={showPdf}>
                 <View style={{ flex: 1 }}>
                     <Button title='Close' onPress={() => closeShowPdf()} />
-                    <ShowPdf />
+                    <DisplayFile />
                 </View>
             </Modal>
             <Text style={styles.header}>{t('Your documents')}</Text>
