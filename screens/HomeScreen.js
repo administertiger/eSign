@@ -23,6 +23,9 @@ function HomeScreen({ navigation }) {
         //Handle back button
         const backAction = () => {
             setBackHandler(true);
+            setTimeout(() => {
+                setBackHandler(false);
+            }, 2000)
             return true;
             //navigation.navigate('HomeDrawer');
             //return true;
@@ -34,6 +37,7 @@ function HomeScreen({ navigation }) {
 
         return () => backHandler.remove();
     }, []);
+
 
     const [documents, setDocuments] = useState([]);
     const [certificates, setCertificates] = useState([]);
@@ -115,9 +119,9 @@ function HomeScreen({ navigation }) {
                 transparent={true}
                 visible={backHandler}
                 onRequestClose={() => BackHandler.exitApp()}>
-                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 50 }}>
                     <View style={styles.alertBox}>
-                        <Text style={{ fontSize: 19, paddingBottom: 5 }}>{t('Tab again to exit')}</Text>
+                        <Text style={{ fontSize: 19, paddingBottom: 5, color: 'white' }}>{t('Tab again to exit')}</Text>
                     </View>
                 </View>
             </Modal>
@@ -256,11 +260,13 @@ const styles = StyleSheet.create({
     alertBox: {
         //alignItems: 'center',
         //justifyContent: 'center',
-        backgroundColor: 'white',
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
         width: Dimensions.get('window').width - 70,
-        height: 200,
-        padding: 25,
+        height: 60,
         elevation: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 30
     },
     alertButtonSuccess: {
         fontSize: 19,
