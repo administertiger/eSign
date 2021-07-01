@@ -21,6 +21,7 @@ function WorkScreen({ navigation }) {
     const [file, setFile] = useState({});
     const [loading, setLoading] = useState(false);
     const [successModal, setSuccessModal] = useState(false);
+    const [p12lModal, setP12Modal] = useState(false);
     const [xmlText, setXmlText] = useState('')
 
     //-------------------Backhandler handle-------------------
@@ -38,7 +39,7 @@ function WorkScreen({ navigation }) {
         return () => backHandler.remove();
     }, []);
 
-    //------------------------handle choos file--------------------------
+    //------------------------handle choose file--------------------------
 
     useEffect(() => {
         handleChooseFile();
@@ -58,9 +59,10 @@ function WorkScreen({ navigation }) {
             })
 
             console.log(results);
+            setFile(results)
 
             if (results.type === 'text/xml') {
-                setFile(results)
+
                 RNFS.readFile(results.uri)
                     .then((file) => {
                         setXmlText(file)
@@ -69,8 +71,10 @@ function WorkScreen({ navigation }) {
                     })
                     .catch((error) => console.log('err: ' + error));
             } else if (results.type === 'application/pdf') {
-                setFile(results);
+
                 console.log('PDF!!!')
+            } else {
+                setP12Modal(true);
             }
 
 
@@ -126,11 +130,11 @@ function WorkScreen({ navigation }) {
 
     function ShowXml() {
         return (
-            <View style={{ backgroundColor: 'rgba(43, 43, 43, 0.95)' }}>
+            <View style={{ backgroundColor: 'rgba(43, 43, 43, 0.9)' }}>
                 <View style={{ flex: 1, margin: -7, marginTop: -22, marginBottom: 5 }}>
                     <SyntaxHighlighter
-                        language='javascript'
-                        style={a11yDark}
+                        //language='javascript'
+                        //style={a11yDark}
                         highlighter={"prism" || "hljs"}>
                         {xmlText}
                     </SyntaxHighlighter>
@@ -149,9 +153,10 @@ function WorkScreen({ navigation }) {
     function DisplayFile() {
         if (file.type === 'application/pdf') {
             return ShowPdf();
-        } else {
+        } else if ((file.type === 'text/xml')) {
             return ShowXml();
         }
+        return true;
     }
 
     //----------------------handleUploadFile----------------------
@@ -299,6 +304,20 @@ function WorkScreen({ navigation }) {
                             </View>
                         </View>
                     </Modal>
+                    {/* pleaseSelectModal */}
+                    <Modal
+                        animationType="fade"
+                        transparent={true}
+                        visible={p12lModal}>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                            <View style={styles.alertBox}>
+                                <Text style={styles.alertText}>{t('Please choose only PDF or XML file')}</Text>
+                                <TouchableOpacity style={styles.alertButton} onPress={() => { handleChooseFile(), setP12Modal(false) }}>
+                                    <Text style={styles.alertButtonText}>{t('Ok')}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </Modal>
 
                     <DisplayFile />
 
@@ -414,6 +433,10 @@ const styles = StyleSheet.create({
         paddingRight: 15,
         flexDirection: 'row',
 
+    },
+    alertButtonText: {
+        fontSize: 19,
+        color: '#d44253',
     },
 });
 

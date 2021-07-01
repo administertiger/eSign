@@ -45,13 +45,89 @@ function DocumentsScreen({ navigation }) {
     const [file, setFile] = useState({})
     const [xmlText, setXmlText] = useState('')
 
+    const [allButton, setAllButton] = useState(true);
+    const [pdfButton, setPdfButton] = useState(false);
+    const [xmlButton, setXmlButton] = useState(false);
+
     //Modal
     const [infoModal, setInfoModal] = useState(false);
     const [showPdf, setShowPdf] = useState(false)
 
     function getList() {
+        setDocuments([]);
+        setIsLoading(true);
+
+        setAllButton(true);
+        setPdfButton(false);
+        setXmlButton(false);
 
         axios.get(API_URL + '/documents', //Documents API
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + global.token
+                }
+            })
+            .then((response) => {
+                console.log('response = ', response);
+                if (response.data) {
+                    //console.log('Documents List: ', response.data);
+
+                    const data = response.data;
+                    const getFile = data.map((data) => data); //Get file data
+                    const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
+
+                    //Merge File docs array and Certification array togethor.
+                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
+                    console.log('documents = ', merge)
+                    setDocuments(merge);
+                }
+
+            }, (error) => {
+                console.log(error);
+            })
+    }
+    function getPDF() {
+        setDocuments([]);
+        setIsLoading(true);
+
+        setAllButton(false);
+        setPdfButton(true);
+        setXmlButton(false);
+
+        axios.get(API_URL + '/documents?extension=' + 'pdf', //Documents API
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + global.token
+                }
+            })
+            .then((response) => {
+                console.log('response = ', response);
+                if (response.data) {
+                    //console.log('Documents List: ', response.data);
+
+                    const data = response.data;
+                    const getFile = data.map((data) => data); //Get file data
+                    const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
+
+                    //Merge File docs array and Certification array togethor.
+                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
+                    console.log('documents = ', merge)
+                    setDocuments(merge);
+                }
+
+            }, (error) => {
+                console.log(error);
+            })
+    }
+    function getXML() {
+        setDocuments([]);
+        setIsLoading(true);
+
+        setAllButton(false);
+        setPdfButton(false);
+        setXmlButton(true);
+
+        axios.get(API_URL + '/documents?extension=' + 'xml', //Documents API
             {
                 headers: {
                     'Authorization': 'Bearer ' + global.token
@@ -150,14 +226,13 @@ function DocumentsScreen({ navigation }) {
         RNFetchBlob.fetch('GET', "https://ws.esigns.cloud/files/" + item.id, { 'Authorization': 'Bearer ' + global.token, })
             .then((res) => {
                 console.log("Success = ", res);
+                setFile(res);
                 if (res.type === 'base64') {
-                    setFile(res);
                     console.log('PDF');
                 } else if (res.type === 'utf8') {
-                    setFile(res)
                     setXmlText(res.data)
                     console.log('XML')
-                    console.log(res.data)
+                    //console.log(res.data)
                 }
             })
             .catch((err) => { console.log('error', err) }) // To execute when download cancelled and other errors
@@ -196,10 +271,10 @@ function DocumentsScreen({ navigation }) {
     function ShowXml() {
         return (
             <View style={{ backgroundColor: '#2B2B2B' }}>
-                <View style={{ margin: -7, marginVertical: -22, }}>
+                <View style={{ marginBottom: 26, marginTop: -20, marginHorizontal: -8 }}>
                     <SyntaxHighlighter
-                        language='javascript'
-                        style={a11yDark}
+                        //language='javascript'
+                        //style={a11yDark}
                         highlighter={"prism" || "hljs"}>
                         {xmlText}
                     </SyntaxHighlighter>
@@ -212,14 +287,16 @@ function DocumentsScreen({ navigation }) {
     function DisplayFile() {
         if (file.type === 'base64') {
             return ShowPdf();
-        } else {
+        } else if ((file.type === 'utf8')) {
             return ShowXml();
         }
+        return true;
     }
 
     function closeShowPdf() {
         setShowPdf(false);
         setFile({});
+        setXmlText('');
     }
 
     //----------------------Render Items---------------------------
@@ -247,6 +324,7 @@ function DocumentsScreen({ navigation }) {
             </View >
         )
     }
+
     //-------------------------------------------------------------
 
     return (
@@ -255,7 +333,8 @@ function DocumentsScreen({ navigation }) {
             <Modal
                 animationType='fade'
                 transparent={true}
-                visible={infoModal}>
+                visible={infoModal}
+                onRequestClose={() => setInfoModal(false)}>
                 <View style={styles.informationContainer}>
                     <View style={styles.informationBox}>
                         <Text style={{ fontSize: 20, textAlign: 'center', paddingVertical: 10 }}>{selectedFileInfo.fileName}</Text>
@@ -285,13 +364,24 @@ function DocumentsScreen({ navigation }) {
             <Modal
                 animationType='slide'
                 transparent={false}
-                visible={showPdf}>
+                visible={showPdf}
+                onRequestClose={() => setShowPdf(false)}>
                 <View style={{ flex: 1 }}>
                     <Button title='Close' onPress={() => closeShowPdf()} />
+                    <ActivityIndicator size='large' color='black' animating={true} style={{ position: 'absolute', right: 0, left: 0, top: 50 }} />
                     <DisplayFile />
                 </View>
             </Modal>
-            <Text style={styles.header}>{t('Your documents')}</Text>
+
+            <View style={{ width: Dimensions.get('window').width }}>
+                <Text style={styles.header}>{t('Your documents')}</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingEnd: 19 }}>
+                    <Button title='All' onPress={() => { getList() }} disabled={allButton} />
+                    <Button title='PDF' onPress={() => { getPDF() }} disabled={pdfButton} />
+                    <Button title='XML' onPress={() => { getXML() }} disabled={xmlButton} />
+                </View>
+            </View>
+
             <FlatList
                 data={documents.slice(0, itemCount)}
                 renderItem={RenderItem}
