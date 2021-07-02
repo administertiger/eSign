@@ -1,15 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Linking, Alert, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/dist/FontAwesome';
 import { useTranslation } from 'react-i18next';
 
 function AboutScreen({ navigation }) {
     const { t, i18n } = useTranslation();
 
-    return (
-        <View style={styles.box} >
+    const OpenURLButton = ({ url, children }) => {
+        const handlePress = useCallback(async () => {
+            // Checking if the link is supported for links with custom URL scheme.
+            const supported = await Linking.canOpenURL(url);
 
-            <View style={{ paddingBottom: 30, }}>
+            if (supported) {
+                // Opening the link with some app, if the URL scheme is "http" the web link should be opened
+                // by some browser in the mobile
+                await Linking.openURL(url);
+            } else {
+                Alert.alert(`Don't know how to open this URL: ${url}`);
+            }
+        }, [url]);
+
+        return <TouchableOpacity onPress={handlePress} style={{ borderBottomWidth: 1, padding: 0, alignItems: 'center', justifyContent: 'flex-start', borderBottomColor: '#6888C9' }} >
+            <Text style={{ color: '#6888C9', fontSize: 15 }}>{children}</Text>
+        </TouchableOpacity>;
+    };
+
+    return (
+        <ScrollView style={styles.box} >
+
+            <View>
                 <Text style={{ fontSize: 16 }}>          {t('eSings app is an electronic signature mobile app that help you sign electronic documents both electronic sign with your signature picture file or digital sign by your certificate from certificate authority (CA).')}
                 </Text>
                 <Text style={{ fontSize: 16 }}>          {t("This mobile application can help you sign electronic documents anywhere anytime with fast and easy.")}</Text>
@@ -40,7 +59,24 @@ function AboutScreen({ navigation }) {
                 </View>
             </View>
 
-        </View>
+            <Text style={styles.textHeader}>{t('Learn more')}</Text>
+
+            <View style={{ paddingHorizontal: 7, }}>
+                <View style={{ paddingTop: 5 }}>
+                    <Text style={styles.detail}>{t('To learn more about eSigns app or use web app version at  ')} </Text>
+                    <View style={{ justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+                        <OpenURLButton url={'https://www.esigns.cloud'}>https://www.esigns.cloud</OpenURLButton>
+                    </View>
+                    <Text style={{ paddingTop: 20, fontSize: 15 }}>{t('For any enquiries, please email to ')} </Text>
+                    <Text style={{ fontSize: 15, color: '#6888C9' }}>support@esigns.cloud</Text>
+                </View>
+            </View>
+
+            <Text>  </Text>
+            <Text>  </Text>
+            <Text>  </Text>
+            <Text>  </Text>
+        </ScrollView>
     )
 }
 
@@ -69,17 +105,21 @@ const styles = StyleSheet.create({
     },
 
     box: {
-        flex: 1,
+        //flex: 1,
         //justifyContent: 'center',
         //alignItems: 'flex-start',
-        padding: 10,
-        paddingHorizontal: 19,
-        paddingTop: 15
+        paddingVertical: 10,
+        paddingHorizontal: 17,
+        //paddingTop: 15,
+        //borderWidth: 3,
+        //margin: 10
+        //paddingBottom: 50
 
     },
     textHeader: {
         fontSize: 20,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        paddingTop: 20,
     },
     detail: {
         fontSize: 15

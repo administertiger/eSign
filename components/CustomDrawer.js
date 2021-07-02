@@ -103,7 +103,7 @@ function SideBar({ ...props }) {
         global.lastName = '';
         global.name = '';
 
-        props.navigation.navigate('LogoutDrawer')
+        props.navigation.push('LogoutScreen')
         console.log("result = ", result)
     }
 

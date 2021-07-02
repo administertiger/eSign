@@ -43,9 +43,12 @@ function HomeScreen({ navigation }) {
     const [certificates, setCertificates] = useState([]);
     const [isLoading, setIsLoading] = useState(true)
     const [backHandler, setBackHandler] = useState(false)
+    const [emptyContent, setEmptyContent] = useState(false);
 
     //--------------------Get documents--------------------
     function getList() {
+        setEmptyContent(false);
+
         axios.get(API_URL + '/documents',  //Documents API
             {
                 headers: {
@@ -55,17 +58,26 @@ function HomeScreen({ navigation }) {
             .then((response) => {
                 //console.log('response = ', response);
                 if (response.data) {
-                    //console.log('Documents List: ', response.data);
+                    console.log('Documents List: ', response.data);
 
                     const data = response.data;
-                    const getFile = data.map((data) => data); //Get file data
-                    const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
 
-                    //Merge File docs array and Certification array togethor.
-                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
-                    console.log('documents = ', merge)
-                    setDocuments(merge);
-                    setIsLoading(false);
+                    if (data.length !== 0) {
+
+                        const getFile = data.map((data) => data); //Get file data
+                        const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
+
+                        //Merge File docs array and Certification array togethor.
+                        const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
+                        console.log('documents = ', merge)
+
+                        setEmptyContent(false);
+                        setDocuments(merge);
+                    } else {
+                        setIsLoading(false);
+                        setEmptyContent(true);
+                        console.log('Nothing')
+                    }
                 }
 
             }, (error) => {
@@ -111,6 +123,18 @@ function HomeScreen({ navigation }) {
         )
     }
 
+    function EmptyContent() {
+        if (!emptyContent) {
+            return null;
+        } else {
+            return (
+                <View style={styles.emptyContent}>
+                    <Text>{t('Your document is empty')}</Text>
+                </View>
+            )
+        }
+    }
+
     return (
         <View style={{ flex: 1 }}>
             {/* Backhandler */}
@@ -143,7 +167,7 @@ function HomeScreen({ navigation }) {
                 <Text style={{ padding: 10, paddingTop: 5, paddingStart: 17, fontSize: 20 }}>{t('Your recent activity')}</Text>
 
 
-
+                <EmptyContent />
                 <FlatList data={documents.slice(0, 10)} renderItem={renderItem} ListFooterComponent={
                     <View>
                         <View style={{ marginBottom: 10, }} />
@@ -231,6 +255,9 @@ const styles = StyleSheet.create({
         elevation: 3,
         //width: Dimensions.get('window').width - 30,
 
+    },
+    emptyContent: {
+        alignItems: 'center'
     },
 
     //Header---------

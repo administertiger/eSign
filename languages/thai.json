@@ -55,6 +55,7 @@
         "Reset password": "รีเซ็ทรหัสผ่าน",
         "Tab again to exit": "กดอีกครั้งเพื่อออก",
         "Loading": "โหลดข้อมูล...",
-        "Please choose only PDF or XML file": "โปรดเลือกเฉพาะไฟล์ PDF หรือ XML"
+        "Please choose only PDF or XML file": "โปรดเลือกเฉพาะไฟล์ PDF หรือ XML",
+        "Your document is empty": "คุณยังไม่มีเอกสาร..."
     }
 }

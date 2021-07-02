@@ -6,13 +6,6 @@ import Icon from 'react-native-vector-icons/dist/FontAwesome5'
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
-const initialState = {
-    hasLoggedInOnce: false,
-    provider: '',
-    accessToken: '',
-    accessTokenExpirationDate: '',
-    refreshToken: ''
-};
 
 function LogoutScreen({ navigation }) {
     const API_URL = 'https://ws.esigns.cloud';
@@ -53,7 +46,7 @@ function LogoutScreen({ navigation }) {
                     setHomepageReady(true);
 
                     setTimeout(() => {
-                        navigation.navigate('HomeDrawer');
+                        navigation.push('MainScreen');
                     }, 1500)
                 }
 

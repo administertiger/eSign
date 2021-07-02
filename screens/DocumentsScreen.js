@@ -44,6 +44,7 @@ function DocumentsScreen({ navigation }) {
     const [selectedFileInfo, setSelectedFileInfo] = useState({});
     const [file, setFile] = useState({})
     const [xmlText, setXmlText] = useState('')
+    const [emptyContent, setEmptyContent] = useState(false);
 
     const [allButton, setAllButton] = useState(true);
     const [pdfButton, setPdfButton] = useState(false);
@@ -56,6 +57,7 @@ function DocumentsScreen({ navigation }) {
     function getList() {
         setDocuments([]);
         setIsLoading(true);
+        setEmptyContent(false);
 
         setAllButton(true);
         setPdfButton(false);
@@ -70,16 +72,26 @@ function DocumentsScreen({ navigation }) {
             .then((response) => {
                 console.log('response = ', response);
                 if (response.data) {
-                    //console.log('Documents List: ', response.data);
+                    console.log('Documents List: ', response.data);
 
                     const data = response.data;
-                    const getFile = data.map((data) => data); //Get file data
-                    const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
 
-                    //Merge File docs array and Certification array togethor.
-                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
-                    console.log('documents = ', merge)
-                    setDocuments(merge);
+                    if (data.length !== 0) {
+
+                        const getFile = data.map((data) => data); //Get file data
+                        const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
+
+                        //Merge File docs array and Certification array togethor.
+                        const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
+                        console.log('documents = ', merge)
+
+                        setEmptyContent(false);
+                        setDocuments(merge);
+                    } else {
+                        setIsLoading(false);
+                        setEmptyContent(true);
+                        console.log('Nothing')
+                    }
                 }
 
             }, (error) => {
@@ -89,6 +101,7 @@ function DocumentsScreen({ navigation }) {
     function getPDF() {
         setDocuments([]);
         setIsLoading(true);
+        setEmptyContent(false);
 
         setAllButton(false);
         setPdfButton(true);
@@ -103,16 +116,26 @@ function DocumentsScreen({ navigation }) {
             .then((response) => {
                 console.log('response = ', response);
                 if (response.data) {
-                    //console.log('Documents List: ', response.data);
+                    console.log('Documents List: ', response.data);
 
                     const data = response.data;
-                    const getFile = data.map((data) => data); //Get file data
-                    const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
 
-                    //Merge File docs array and Certification array togethor.
-                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
-                    console.log('documents = ', merge)
-                    setDocuments(merge);
+                    if (data.length !== 0) {
+
+                        const getFile = data.map((data) => data); //Get file data
+                        const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
+
+                        //Merge File docs array and Certification array togethor.
+                        const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
+                        console.log('documents = ', merge)
+
+                        setEmptyContent(false);
+                        setDocuments(merge);
+                    } else {
+                        setIsLoading(false);
+                        setEmptyContent(true);
+                        console.log('Nothing')
+                    }
                 }
 
             }, (error) => {
@@ -122,6 +145,7 @@ function DocumentsScreen({ navigation }) {
     function getXML() {
         setDocuments([]);
         setIsLoading(true);
+        setEmptyContent(false);
 
         setAllButton(false);
         setPdfButton(false);
@@ -136,16 +160,26 @@ function DocumentsScreen({ navigation }) {
             .then((response) => {
                 console.log('response = ', response);
                 if (response.data) {
-                    //console.log('Documents List: ', response.data);
+                    console.log('Documents List: ', response.data);
 
                     const data = response.data;
-                    const getFile = data.map((data) => data); //Get file data
-                    const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
 
-                    //Merge File docs array and Certification array togethor.
-                    const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
-                    console.log('documents = ', merge)
-                    setDocuments(merge);
+                    if (data.length !== 0) {
+
+                        const getFile = data.map((data) => data); //Get file data
+                        const getCertificate = data.map((data) => data.signatures[0]);  //Get certification
+
+                        //Merge File docs array and Certification array togethor.
+                        const merge = getFile.map((a, i) => Object.assign({}, a, getCertificate[i],))
+                        console.log('documents = ', merge)
+
+                        setEmptyContent(false);
+                        setDocuments(merge);
+                    } else {
+                        setIsLoading(false);
+                        setEmptyContent(true);
+                        console.log('Nothing')
+                    }
                 }
 
             }, (error) => {
@@ -154,6 +188,7 @@ function DocumentsScreen({ navigation }) {
     }
 
     function handleLoadMore() {
+        //setIsLoading(true);
         const addNumber = 10;
 
         if (itemCount < documents.length) {
@@ -325,6 +360,18 @@ function DocumentsScreen({ navigation }) {
         )
     }
 
+    function EmptyContent() {
+        if (!emptyContent) {
+            return null;
+        } else {
+            return (
+                <View style={styles.emptyContent}>
+                    <Text>{t('Your document is empty')}</Text>
+                </View>
+            )
+        }
+    }
+
     //-------------------------------------------------------------
 
     return (
@@ -382,6 +429,7 @@ function DocumentsScreen({ navigation }) {
                 </View>
             </View>
 
+            <EmptyContent />
             <FlatList
                 data={documents.slice(0, itemCount)}
                 renderItem={RenderItem}
@@ -431,6 +479,9 @@ const styles = StyleSheet.create({
         flex: 1,
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,
+    },
+    emptyContent: {
+        paddingTop: 20
     },
     //------------Modal-------------
     informationContainer: {
